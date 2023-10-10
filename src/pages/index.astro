@@ -1,0 +1,28 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Messages from '../components/Messages.tsx';
+---
+
+<Layout title="Welcome to Astro.">
+  <header></header>
+  <nav>
+    <ul>
+      <li><a href="/">Messages</a></li>
+      <li><a href="/about">About</a></li>
+      <li><a href="/contact">Contact</a></li>
+    </ul>
+  </nav>
+	<main>
+    <Messages client:only="solid" />
+	</main>
+  <footer>
+    <nav>
+      <ul>
+        <li><a href="/">Messages</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="/contact">Contact</a></li>
+      </ul>
+    </nav>
+  </footer>
+</Layout>
+
