@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
-    "start": "./fetch_messages.sh && astro dev",
+    "start": "./fetch_data.sh && astro dev",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro"

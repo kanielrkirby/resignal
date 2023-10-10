@@ -51,3 +51,25 @@ fi
 
 # Add a comma to the end of each line except the last
 sed -i -e '$!s/$/,/' "$msgs";
+
+rm -f "$msgs.tmp" "$msgs-e";
+
+echo "Messages saved to $msgs";
+
+# now we need to get the database data (contacts, groups, etc)
+# key is the same
+
+conversations="./plain-text-conversations.json";
+
+$sqlcipher_cmd -list -noheader "$db" "PRAGMA key = \"x'"$key"'\";SELECT json FROM conversations;" > "$conversations";
+
+if [ "$(head -n 1 "$conversations")" = "ok" ]; then
+    tail -n +2 "$conversations" > "$conversations.tmp";
+    mv "$conversations.tmp" "$conversations";
+fi
+
+sed -i -e '$!s/$/,/' "$conversations";
+
+rm -f "$conversations.tmp" "$conversations-e";
+
+echo "Conversations saved to $conversations";
