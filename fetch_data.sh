@@ -39,7 +39,7 @@ jq_cmd=$(get_cmd jq);
 signal_dir=$(get_dir ~/.config/Signal ~/Library/Application\ Support/Signal ~/AppData/Roaming/Signal);
 key=$( $jq_cmd -r '."key"' "${signal_dir}/config.json" );
 db="${signal_dir}/sql/db.sqlite";
-msgs="./plain-text-messages.json";
+msgs="./messages.json";
 
 # Get messages
 $sqlcipher_cmd -list -noheader "$db" "PRAGMA key = \"x'"$key"'\";select json from messages;" > "$msgs";
@@ -49,8 +49,7 @@ if [ "$(head -n 1 "$msgs")" = "ok" ]; then
     mv "$msgs.tmp" "$msgs";
 fi
 
-# Add a comma to the end of each line except the last
-sed -i -e '$!s/$/,/' "$msgs";
+sed -i -e '1s/^/[/; $s/$/]/; $!s/$/,/' "$msgs";
 
 rm -f "$msgs.tmp" "$msgs-e";
 
@@ -59,7 +58,7 @@ echo "Messages saved to $msgs";
 # now we need to get the database data (contacts, groups, etc)
 # key is the same
 
-conversations="./plain-text-conversations.json";
+conversations="./conversations.json";
 
 $sqlcipher_cmd -list -noheader "$db" "PRAGMA key = \"x'"$key"'\";SELECT json FROM conversations;" > "$conversations";
 
@@ -68,7 +67,7 @@ if [ "$(head -n 1 "$conversations")" = "ok" ]; then
     mv "$conversations.tmp" "$conversations";
 fi
 
-sed -i -e '$!s/$/,/' "$conversations";
+sed -i -e '1s/^/[/; $s/$/]/; $!s/$/,/' "$conversations";
 
 rm -f "$conversations.tmp" "$conversations-e";
 
