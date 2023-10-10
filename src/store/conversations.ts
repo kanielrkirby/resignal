@@ -89,9 +89,17 @@ type Conversation = {
 export const $conversations = map<Conversation[]>([])
 
 async function getConversations() {
-    const response = await fetch("/conversations.json")
-    const data = await response.json()
-    return data.conversations
+    try {
+        const response = await fetch("/conversations.json");
+
+        if (!response.ok) {
+            throw new Error(`Fetch failed with status ${response.status}`);
+        }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Error fetching JSON data:", error);
+    }
 }
 
 getConversations().then($conversations.set)

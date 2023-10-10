@@ -1,4 +1,4 @@
-import { map } from "nanostores"
+import { atom } from "nanostores"
 
 type Message = {
   timestamp: number;
@@ -30,7 +30,7 @@ type Message = {
   sourceServiceId: string;
 }
 
-export const $messages = map<Message[]>([])
+export const $messages = atom<Message[]>([])
 
 async function getMessages() {
   try {
@@ -39,13 +39,12 @@ async function getMessages() {
     if (!response.ok) {
       throw new Error(`Fetch failed with status ${response.status}`);
     }
-
     const data = await response.json();
-    return data.messages;
+    return data;
   } catch (error) {
     console.error("Error fetching JSON data:", error);
   }
 }
 
+$messages.set(await getMessages());
 
-getMessages().then($messages.set)

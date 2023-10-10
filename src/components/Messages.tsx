@@ -1,16 +1,17 @@
-import { createSignal, For } from "solid-js";
+import { For } from "solid-js";
 import { $messages } from "../store/messages";
-//import { $conversations } from "../store/conversations";
+import { $conversations } from "../store/conversations";
 import { useStore } from "@nanostores/solid";
 
 export default function Messages() {
   const messages = useStore($messages);
+  const conversations = useStore($conversations)
 
   return (
     <ul>
       <For each={messages()}>
         {(message) => (
-          <li>
+          <li class={`${""}`}>
             {message.body}
           </li>
         )}

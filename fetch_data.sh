@@ -72,3 +72,74 @@ sed -i -e '1s/^/[/; $s/$/]/; $!s/$/,/' "$conversations";
 rm -f "$conversations.tmp" "$conversations-e";
 
 echo "Conversations saved to $conversations";
+
+other_data="./other_data.json";
+
+SQL_STATEMENTS=()
+
+TABLES=$($sqlcipher_cmd -list "$db" "PRAGMA key = \"x'"$key"'\";SELECT name FROM sqlite_master WHERE type='table';")
+TABLES=$(echo "$TABLES" | tail -n +2)
+
+for table in $TABLES; do
+    # if json is a column
+    if [[ $($sqlcipher_cmd -list "$db" "PRAGMA key = \"x'"$key"'\";SELECT sql FROM sqlite_master WHERE type='table' AND name='$table';") == *"json"* ]]; then
+        SQL_STATEMENTS+=("SELECT json FROM $table;")
+    fi
+done
+
+sql=$(IFS=" UNION ALL "; echo "${SQL_STATEMENTS[*]}")
+
+echo "Constructed SQL: $sql"
+
+$sqlcipher_cmd -list -noheader "$db" -cmd "PRAGMA key = \"x'"$key"'\";" "$sql" > "$other_data"
+
+if [ "$(head -n 1 "$other_data")" = "ok" ]; then
+    tail -n +2 "$other_data" > "$other_data.tmp";
+    mv "$other_data.tmp" "$other_data";
+fi
+
+sed -i -e '1s/^/[/; $s/$/]/; $!s/$/,/' "$other_data";
+
+rm -f "$other_data.tmp" "$other_data-e";
+
+echo "Other data saved to $other_data";
+
+# TABLES
+# sqlite_stat4
+# conversations
+# identityKeys
+# items
+# sessions
+# attachment_downloads
+# sticker_packs
+# stickers
+# sticker_references
+# emojis
+# messages
+# jobs
+# reactions
+# senderKeys
+# unprocessed
+# sendLogPayloads
+# sendLogRecipients
+# sendLogMessageIds
+# preKeys
+# signedPreKeys
+# badges
+# badgeImageFiles
+# storyReads
+# storyDistributions
+# storyDistributionMembers
+# uninstalled_sticker_packs
+# groupCallRingCancellations
+# messages_fts_data
+# messages_fts_idx
+# messages_fts_content
+# messages_fts_docsize
+# messages_fts_config
+# edited_messages
+# mentions
+# kyberPreKeys
+# callsHistory
+# messages_fts
+

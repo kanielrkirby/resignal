@@ -4,6 +4,8 @@ import Messages from '../components/Messages.tsx';
 ---
 
 <Layout title="Welcome to Astro.">
-  <Messages client:load />
+  <main>
+    <Messages client:only="solid-js" />
+  </main>
 </Layout>
 
