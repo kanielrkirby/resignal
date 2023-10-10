@@ -1,0 +1,54 @@
+---
+import Layout from "../../layouts/Layout.astro"
+
+export type Params = {
+  conversationId: string;
+};
+
+const { conversationId } = Astro.params;
+---
+
+<Layout title="Messages">
+  <h1>Messages</h1>
+
+  <ul id="messages" class="space-y-4"></ul>
+
+  <span id="temp-conversation-id" data-id={conversationId}></span>
+
+  <script>
+    import { $messages } from '../../store/messages';
+
+    const tempset = document.querySelector('#temp-conversation-id') as HTMLElement
+    const conversationId = tempset.dataset.id
+    tempset.remove()
+
+    const listElem = (document.querySelector('#messages') as HTMLElement)!
+
+    $messages.subscribe((messages) => {
+      listElem.innerHTML = messages
+        .filter((m) => m.conversationId === conversationId)
+        .map((m) => {
+          let elem = ""
+          if (m.body !== "") {
+            elem += `<p class="bg-sky-500 p-1 rounded-md text-white">${m.body}</p>`
+          }
+          for (let i = 0; i < m?.attachments?.length; i++) {
+            const attachment = m.attachments[i]
+            if (attachment.contentType.startsWith("image")) {
+              elem += `<img src="${attachment.url}" alt="Image of something" class="max-w-full max-h-96">`
+            } else if (attachment.contentType.startsWith("video")) {
+              elem += `<video src="${attachment.url}" controls class="max-w-full max-h-96"></video>`
+            } else if (attachment.contentType.startsWith("audio")) {
+              elem += `<audio src="${attachment.url}" controls></audio>`
+            } else {
+              elem += `<a href="${attachment.url}">${attachment.name}</a>`
+            }
+          }
+          elem = `<li>${elem}</li>`
+        return elem
+        })
+        .join('')
+    })
+
+  </script>
+</Layout>

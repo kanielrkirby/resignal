@@ -81,7 +81,9 @@ TABLES=$($sqlcipher_cmd -list "$db" "PRAGMA key = \"x'"$key"'\";SELECT name FROM
 TABLES=$(echo "$TABLES" | tail -n +2)
 
 for table in $TABLES; do
-    # if json is a column
+    if [[ "$table" == "conversations" || "$table" == "messages" ]]; then
+        continue
+    fi
     if [[ $($sqlcipher_cmd -list "$db" "PRAGMA key = \"x'"$key"'\";SELECT sql FROM sqlite_master WHERE type='table' AND name='$table';") == *"json"* ]]; then
         SQL_STATEMENTS+=("SELECT json FROM $table;")
     fi
@@ -143,3 +145,32 @@ echo "Other data saved to $other_data";
 # callsHistory
 # messages_fts
 
+attachments_dir="./attachments";
+
+if [ ! -d "$attachments_dir" ]; then
+  mkdir "$attachments_dir";
+fi
+
+attachments_source="$signal_dir/attachments.noindex";
+
+
+for dir in $(ls "$attachments_source"); do
+  echo "Processing $attachments_source/$dir";
+  for attachment in $(ls "$attachments_source/$dir"); do
+    if [ -f "$attachments_source/$dir/$attachment" ]; then
+      # need to infer content type from the contents of the file
+      ext=$(file -b --mime-type "$attachments_source/$dir/$attachment" | sed -e 's/.*\///');
+      if [ "$ext" = "x-hx-aac-adts" ]; then
+        ext="aac";
+      elif [ "$ext" = "x-m4a" ]; then
+        ext="aac"
+      elif [ "$ext" = "jpeg" ] || [ "$ext" = "jpg" ]; then
+        ext="png"
+      fi
+      echo "Saving $attachments_source/$dir/$attachment as $attachments_dir/$attachment.$ext";
+      cp "$attachments_source/$dir/$attachment" "$attachments_dir"/$attachment.$ext;
+    fi
+  done
+done
+
+echo "Attachments saved to $attachments_dir";
