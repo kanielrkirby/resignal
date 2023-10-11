@@ -19,3 +19,8 @@ pnpm-debug.log*
 
 # macOS-specific files
 .DS_Store
+
+attachments
+messages.json
+conversations.json
+other_data.json
