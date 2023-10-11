@@ -40,27 +40,32 @@ const { title } = Astro.props;
     for (let i = 0; i < entries.length; i++) {
     const conversation = entries[i][1];
     const element = 
-    `<a href="/conversation/${conversation.id}" class="bg-white p-4 rounded-lg ${location.pathname.split("/")[location.pathname.split("/").length - 1] === conversation.id ? "bg-opacity-10" : "bg-opacity-0 hover:bg-opacity-5"}"]>
-      <div class="flex justify-between">
-        <h1 class="font-semibold">
-        ${conversation.conversationTitle}
-        </h1>
-        
-        ${
-          conversation?.lastMessage &&
-          conversation?.lastMessage &&
-          conversation?.timestamp &&
-          `<span class="opacity-70 text-xs">
-            ${
-              timeSince(conversation?.timestamp)
-            }
-          </span>` || ""
-        }
-
+    `<a href="/conversation/${conversation.id}" class="w-full gap-3 bg-white p-4 rounded-lg flex justify-between ${location.pathname.split("/")[location.pathname.split("/").length - 1] === conversation.id ? "bg-opacity-10" : "bg-opacity-0 hover:bg-opacity-5"}"]>
+      ${conversation?.profileAvatar?.path ? `<img src="${location.origin}/attachments/${conversation.profileAvatar.path.split("/")[1]}.jpeg" class="w-12 h-12 rounded-full" />` : ""}
+      <div class="flex flex-col w-full overflow-x-hidden">
+        <div class="flex justify-between w-full">
+          <h1 class="font-semibold">
+          ${conversation.conversationTitle}
+          </h1>
+          
+          ${
+            conversation?.lastMessage &&
+            conversation?.lastMessage &&
+            conversation?.timestamp &&
+            `<span class="opacity-70 text-xs">
+              ${
+                timeSince(conversation?.timestamp)
+              }
+            </span>` || ""
+          }
+        </div>
+        <div class="flex gap-2 w-full">
+          <p class="opacity-70 text-sm text-ellipsis w-full">
+            ${conversation.lastMessage || "No messages yet"}
+          </p>
+          <img src="${location.origin}/icons/messagestatus-${conversation.lastMessageStatus?.toLowerCase() ?? "read"}.svg" class="w-4 h-fit" />
+        </div>
       </div>
-      <p class="opacity-70">
-        ${conversation.lastMessage || "No messages yet"}
-      </p>
     </a>`;
     conversationsList.innerHTML += element;
     }

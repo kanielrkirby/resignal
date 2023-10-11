@@ -9,8 +9,6 @@ const { conversationId } = Astro.params;
 ---
 
 <Layout title="Messages">
-  <h1>Messages</h1>
-
   <ul id="messages" class="flex flex-col gap-4"></ul>
 
   <span id="temp-conversation-id" data-id={conversationId}></span>
