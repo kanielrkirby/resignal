@@ -17,7 +17,6 @@ const { conversationId } = Astro.params;
 
 </Layout>
 <script>
-import { timeSince } from "../../utils/timeSince"
 import { $messages } from '../../store/messages';
 
 const tempset = document.querySelector('#temp-conversation-id') as HTMLElement
@@ -35,7 +34,19 @@ tempset.remove()
           let body = ""
           if (m.timestamp) {
             timestamp = `<span class="whitespace-nowrap text-xs opacity-80 self-end justify-self-end ">${
-              timeSince(m.timestamp)
+              // timestamp anything under an hour ago is "18m" "36m" "4m"
+              // anything over an hour ago is "8:32 PM" "9:32 PM" "10:32 PM"
+              (() => {
+                const now = new Date()
+                const then = new Date(m.timestamp!)
+                const diff = now.getTime() - then.getTime()
+                const diffInMinutes = Math.round(diff / 1000 / 60)
+                if (diffInMinutes < 60) {
+                  return `${diffInMinutes}m`
+                } else {
+                  return then.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
+                }
+               })()
             }</span>`
           }
           if (m.body) {
