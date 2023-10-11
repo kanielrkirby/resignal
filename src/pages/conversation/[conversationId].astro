@@ -30,7 +30,8 @@ const { conversationId } = Astro.params;
         .map((m) => {
           let elem = ""
           if (m.body !== "") {
-            elem += `<p class="bg-sky-500 p-1 rounded-md text-white">${m.body}</p>`
+            const color = m.type === "incoming" ? "bg-neutral-700" : "bg-blue-600"
+            elem += `<p class="${color} p-1 rounded-md text-white">${m.body}</p>`
           }
           for (let i = 0; i < m?.attachments?.length; i++) {
             const attachment = m.attachments[i]
