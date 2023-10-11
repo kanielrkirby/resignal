@@ -164,8 +164,6 @@ for dir in $(ls "$attachments_source"); do
         ext="aac";
       elif [ "$ext" = "x-m4a" ]; then
         ext="aac"
-      elif [ "$ext" = "jpeg" ] || [ "$ext" = "jpg" ]; then
-        ext="png"
       fi
       echo "Saving $attachments_source/$dir/$attachment as $attachments_dir/$attachment.$ext";
       cp "$attachments_source/$dir/$attachment" "$attachments_dir"/$attachment.$ext;
