@@ -1,0 +1,17 @@
+---
+const icons = await Astro.glob('../../icons/*.svg');
+---
+
+<div class="bg-white flex flex-col gap-8">
+  {icons.map((icon) => {
+    console.log(icon);
+    return (
+      <div class="flex items-center gap-4">
+        <span>{
+          icon.default.src.split("/").pop().split(".")[0]
+        }</span>
+        <img src={`${icon.default.src}`} alt="" />
+      </div>
+    )
+  })}
+</div>

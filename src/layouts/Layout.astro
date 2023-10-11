@@ -18,28 +18,12 @@ const { title } = Astro.props;
 	</head>
 	<body>
     <header></header>
-    <nav>
-      <ul>
-        <li><a href="/">Messages</a></li>
-        <li><a href="/about">About</a></li>
-        <li><a href="/contact">Contact</a></li>
-      </ul>
-    </nav>
-    <div>
-      <nav id="conversations" class="bg-zinc-800 flex flex-col p-2 gap-1">
+    <div class="flex">
+      <nav id="conversations" class="bg-zinc-800 flex flex-col p-2 gap-1 max-sm:hidden">
         
       </nav>
       <slot />
     </div>
-    <footer>
-      <nav>
-        <ul>
-          <li><a href="/">Messages</a></li>
-          <li><a href="/about">About</a></li>
-          <li><a href="/contact">Contact</a></li>
-        </ul>
-      </nav>
-    </footer>
 	</body>
 </html>
 
