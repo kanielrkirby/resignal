@@ -34,8 +34,10 @@ const tempset = document.querySelector('#temp-conversation-id') as HTMLElement
           let elem = ""
           let timestamp = ""
           let body = ""
+          let status = m?.sendStateByConversationId && m.sendStateByConversationId[m.conversationId] ? m.sendStateByConversationId[m.conversationId].status.toLowerCase() : "read"
+          let image = `<img src="/icons/messagestatus-${status}.svg" alt="${status}" class="w-4 opacity-90">`
           if (m.timestamp) {
-            timestamp = `<span class="whitespace-nowrap text-xs opacity-80 self-end justify-self-end ">${
+            timestamp = `<span class="whitespace-nowrap flex text-xs opacity-80 self-end justify-self-end items-center gap-1">${
               // timestamp anything under an hour ago is "18m" "36m" "4m"
               // anything over an hour ago is "8:32 PM" "9:32 PM" "10:32 PM"
               (() => {
@@ -49,7 +51,7 @@ const tempset = document.querySelector('#temp-conversation-id') as HTMLElement
                   return then.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
                 }
                })()
-            }</span>`
+            }${image}</span>`
           }
           if (m.body) {
             body = `<p class="">${m.body}</p>`
@@ -83,6 +85,10 @@ const tempset = document.querySelector('#temp-conversation-id') as HTMLElement
             } else {
               date = new Date(day.getTime()).toLocaleDateString([], { year: 'numeric', month: 'short', day: 'numeric' })
             }
+            //            messagestatus-delivered - Delivered
+            //            messagestatus-read - Read
+            //            messagestatus-sending - Sending
+            //            messagestatus-sent - Sent
             elem = `<li class="text-center text-sm opacity-95">${date}</li>${elem}`
           }
           return elem

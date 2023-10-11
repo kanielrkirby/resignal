@@ -50,6 +50,11 @@ export type Message = {
   requiredProtocolVersion: number;
   supportedVersionAtReceive: number;
   sourceServiceId: string;
+  sendStateByConversationId: {
+    [key: string]: {
+      status: string;
+    }
+  }
 }
 
 export const $messages = atom<Message[]>([])
