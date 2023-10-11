@@ -18,5 +18,9 @@
     "nanostores": "^0.9.3",
     "solid-js": "^1.4.3",
     "tailwindcss": "^3.0.24"
+  },
+  "devDependencies": {
+    "prettier-plugin-astro": "^0.12.0",
+    "prettier-plugin-tailwindcss": "^0.5.5"
   }
 }
