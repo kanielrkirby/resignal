@@ -21,9 +21,11 @@ import { $messages } from '../../store/messages';
 
 const tempset = document.querySelector('#temp-conversation-id') as HTMLElement
   const conversationId = tempset.dataset.id
-tempset.remove()
+  tempset.remove()
 
   const listElem = (document.querySelector('#messages') as HTMLElement)!
+  
+  let day: Date
 
   $messages.subscribe((messages) => {
       listElem.innerHTML = messages
@@ -68,7 +70,22 @@ tempset.remove()
           }
           const align = m.type === "incoming" ? "self-start" : "self-end"
           elem = `<li class="${align}">${elem}</li>`
-            return elem
+
+          // if day is different from last message, add a day header
+          const messageDay = new Date(m.timestamp!).toLocaleDateString()
+          if (messageDay !== day?.toLocaleDateString()) {
+            day = new Date(m.timestamp!)
+            // date will be "Wed, Sep 15" if it's less than a year OR "Feb 21, 2021" if it's greater than a year
+            let date: string
+            const timeSince = new Date().getTime() - day.getTime()
+            if (timeSince < 1000 * 60 * 60 * 24 * 365) {
+              date = new Date(day.getTime()).toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })
+            } else {
+              date = new Date(day.getTime()).toLocaleDateString([], { year: 'numeric', month: 'short', day: 'numeric' })
+            }
+            elem = `<li class="text-center text-sm opacity-95">${date}</li>${elem}`
+          }
+          return elem
       })
       .join('')
   })
