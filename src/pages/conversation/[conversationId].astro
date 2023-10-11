@@ -11,7 +11,7 @@ const { conversationId } = Astro.params;
 <Layout title="Messages">
   <h1>Messages</h1>
 
-  <ul id="messages" class="space-y-4"></ul>
+  <ul id="messages" class="flex flex-col gap-4"></ul>
 
   <span id="temp-conversation-id" data-id={conversationId}></span>
 
@@ -31,7 +31,7 @@ const { conversationId } = Astro.params;
           let elem = ""
           if (m.body !== "") {
             const color = m.type === "incoming" ? "bg-neutral-700" : "bg-blue-600"
-            elem += `<p class="${color} p-1 rounded-md text-white">${m.body}</p>`
+            elem += `<p class="${color} text-[.91rem] px-3 py-2 rounded-2xl text-white w-fit self-end">${m.body}</p>`
           }
           for (let i = 0; i < m?.attachments?.length; i++) {
             const attachment = m.attachments[i]
