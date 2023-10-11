@@ -33,9 +33,9 @@ const tempset = document.querySelector('#temp-conversation-id') as HTMLElement
           let timestamp = ""
           let body = ""
           let status = m?.sendStateByConversationId && m.sendStateByConversationId[m.conversationId] ? m.sendStateByConversationId[m.conversationId].status.toLowerCase() : "read"
-          let image = `<img src="/icons/messagestatus-${status}.svg" alt="${status}" class="w-4 opacity-90">`
+          let image = `<img src="/icons/messagestatus-${status}.svg" alt="${status}" class="w-4 opacity-90 shrink-0">`
           if (m.timestamp) {
-            timestamp = `<span class="whitespace-nowrap flex text-xs opacity-80 self-end justify-self-end items-center gap-1">${
+            timestamp = `<span class="whitespace-nowrap flex text-xs opacity-80 self-end justify-self-end items-center gap-1 shrink-0">${
               // timestamp anything under an hour ago is "18m" "36m" "4m"
               // anything over an hour ago is "8:32 PM" "9:32 PM" "10:32 PM"
               (() => {
