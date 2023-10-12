@@ -39,8 +39,11 @@ const { conversationId } = Astro.params;
     let prev: typeof messages[0] | undefined;
     for (let i = 0; i < elems.length; i++) {
       const m = messages[i];
+
       if (m.conversationId !== conversationId) continue;
       if (!m.body && !m.attachments?.length) continue;
+
+      // find next message in conversation
       let next: typeof m | undefined = undefined
       let j = 0
       function tryNext() {
@@ -51,36 +54,13 @@ const { conversationId } = Astro.params;
         return
       }
       if (m.body !== conversation.lastMessage) tryNext()
-      let elem = "";
-      let timestamp = "";
-      let body = "";
-      let status =
-        m?.sendStateByConversationId &&
-        m.sendStateByConversationId[m.conversationId]
-          ? m.sendStateByConversationId[m.conversationId].status.toLowerCase()
-          : "read";
-      let image = `<img src="/icons/messagestatus-${status}.svg" alt="${status}" class="w-4 opacity-90 shrink-0">`;
-      if (m.timestamp) {
-        timestamp = `<span class="whitespace-nowrap flex text-xs opacity-80 self-end justify-self-end items-center gap-1 shrink-0">${
-          // timestamp anything under an hour ago is "18m" "36m" "4m"
-          // anything over an hour ago is "8:32 PM" "9:32 PM" "10:32 PM"
-          (() => {
-            const now = new Date();
-            const then = new Date(m.timestamp!);
-            const diff = now.getTime() - then.getTime();
-            const diffInMinutes = Math.round(diff / 1000 / 60);
-            if (diffInMinutes < 60) {
-              return `${diffInMinutes}m`;
-            } else {
-              return then.toLocaleTimeString([], {
-                hour: "numeric",
-                minute: "2-digit",
-              });
-            }
-          })()
-        }${image}</span>`;
-      }
+
+      // conversation identity styling
       const align = m.type === "incoming" ? "self-start" : "self-end";
+      const color = m.type === "incoming" ? "bg-neutral-700" : "bg-blue-600";
+      let dateOrBlank = "";
+
+      // timestamp grouping
       let topLi = "";
       let topInner = "";
       let bottomInner = "";
@@ -91,32 +71,43 @@ const { conversationId } = Astro.params;
       if (next?.type === m?.type && next?.timestamp && m?.timestamp && next.timestamp - m.timestamp < 300000) {
         bottomInner = align === "self-start" ? "rounded-bl-sm" : "rounded-br-sm"
       }
-      if (m.body) {
-        body = `<p class="overflow-hidden">${m.body}</p>`;
-      }
-      if (body !== "") {
-        const color = m.type === "incoming" ? "bg-neutral-700" : "bg-blue-600";
-        elem += `<div class="${color} ${topInner} ${bottomInner} justify-end gap-3 text-[.91rem] px-3 py-2 rounded-2xl text-white w-fit self-end flex">${body}${
-          timestamp || ""
-        }</div>`;
-      }
+
+      // message status styling
+      let status =
+        m?.sendStateByConversationId &&
+        m.sendStateByConversationId[m.conversationId]
+          ? m.sendStateByConversationId[m.conversationId].status.toLowerCase()
+          : "read";
+      let image = `<img src="/icons/messagestatus-${status}.svg" alt="${status}" class="w-4 opacity-90 shrink-0">`;
+
+      // timestamp styling
+      const timestamp = m.timestamp ? `<span class="whitespace-nowrap flex text-xs opacity-80 self-end justify-self-end items-center gap-1 shrink-0">${
+        getTimestamp(m.timestamp)
+      }${image}</span>` : "";
+
+      // attachments
+      let attachmentElements = "";
       for (let i = 0; i < m?.attachments?.length; i++) {
         const attachment = m.attachments[i];
         if (attachment.contentType.startsWith("image")) {
-          elem += `<img src="${attachment.url}" alt="Image of something" class="max-w-full max-h-96">`;
+          attachmentElements += `<img src="${attachment.url}" alt="Image, something went wrong." class="max-w-full max-h-96 rounded-md">`;
         } else if (attachment.contentType.startsWith("video")) {
-          elem += `<video src="${attachment.url}" controls class="max-w-full max-h-96"></video>`;
+          attachmentElements += `<video src="${attachment.url}" controls class="max-w-full max-h-96 rounded-md"></video>`;
         } else if (attachment.contentType.startsWith("audio")) {
-          elem += `<audio src="${attachment.url}" controls></audio>`;
+          attachmentElements += `<audio src="${attachment.url}" controls class="rounded-md"></audio>`;
         }
       }
-      elem = `<li class="max-w-[85%] ${topLi} ${align}">${elem}</li>`;
 
-      // if day is different from last message, add a day header
+      // message container
+      let colorContainer = m.body ? `<div class="${color} ${topInner} ${bottomInner} justify-end gap-3 text-[.91rem] px-3 py-2 rounded-2xl text-white w-fit self-end flex"><p class="overflow-hidden">${m.body}</p>${
+          timestamp || ""
+        }${attachmentElements}</div>` : ""
+      let elem = `<li class="max-w-[85%] ${topLi} ${align}">${colorContainer}</li>`;
+
+      // date grouping
       const messageDay = new Date(m.timestamp!).toLocaleDateString();
       if (messageDay !== day?.toLocaleDateString()) {
         day = new Date(m.timestamp!);
-        // date will be "Wed, Sep 15" if it's less than a year OR "Feb 21, 2021" if it's greater than a year
         let date: string;
         const timeSince = new Date().getTime() - day.getTime();
         if (timeSince < 1000 * 60 * 60 * 24 * 365) {
@@ -132,14 +123,29 @@ const { conversationId } = Astro.params;
             day: "numeric",
           });
         }
-        elem = `<li class="text-center text-sm opacity-95">${date}</li>${elem}`;
+        dateOrBlank = `<li class="text-center text-sm opacity-95">${date}</li>`;
       }
-      console.log("_");
-      console.log("m", m);
-      console.log("prev", prev);
+
       prev = m
+      html += dateOrBlank;
       html += elem;
     }
     listElem.innerHTML = html;
   });
+
+  function getTimestamp(timestamp: number) {
+    const now = new Date();
+    const then = new Date(timestamp!);
+    const diff = now.getTime() - then.getTime();
+    const diffInMinutes = Math.round(diff / 1000 / 60);
+    if (diffInMinutes < 60) {
+      return `${diffInMinutes}m`;
+    } else {
+      return then.toLocaleTimeString([], {
+        hour: "numeric",
+        minute: "2-digit",
+      });
+    }
+  }
 </script>
+
