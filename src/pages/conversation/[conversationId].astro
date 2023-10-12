@@ -136,12 +136,21 @@ const { conversationId } = Astro.params;
       if (linkInBody) console.log(linkInBody[0])
       body = body.replaceAll(/\n/g, "<br />")
       if (linkInBody) {
+        body = body.replace(
+          linkInBody[0],
+          `<a href="${linkInBody[0]}" target="_blank" class="underline">${linkInBody[0]}</a>`,
+        );
         if (!hasVisualMedia) {
           (async () => {
             const { image, title, description, url, published, error } =
               await getLink(linkInBody[0]);
             if (error) {
               console.error(error);
+              setTimeout(() => {
+                const elem = document.querySelector(`#${messageId}`) as
+                  | HTMLElement
+                  | undefined;
+              }, 1000);
             } else {
               const linkElem = `
 <li id=${messageId} class="sm:w-[85%] md:w-[75%] lg:w-[65%] flex ${topLi} ${alignItems} ${align}">
@@ -186,17 +195,7 @@ const { conversationId } = Astro.params;
               }, 1000);
             }
           })();
-        } else {
-          // has visual media
-          console.log("has visual media")
-          console.log(body)
-          console.log(linkInBody[0])
-          body = body.replace(
-            linkInBody[0],
-            `<a href="${linkInBody[0]}" target="_blank" class="underline">${linkInBody[0]}</a>`,
-          );
-          console.log(body)
-        }
+        } 
       }
 
       // message container
