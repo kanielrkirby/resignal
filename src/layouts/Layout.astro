@@ -20,10 +20,26 @@ const { title } = Astro.props;
     <header></header>
     <div class="flex h-full">
       <div class="flex h-full">
+        <menu
+          id="archived"
+          class="hidden flex-col items-center gap-1 overflow-y-scroll bg-zinc-800 p-2 w-[300px]"
+        >
+          <header class="flex mb-4 p-2 justify-center items-center relative w-full h-fit opacity-90">
+            <button class="top-0 bottom-0 my-auto left-0 absolute bg-white bg-opacity-0 hover:bg-opacity-10 p-2 rounded-md">
+              <img src="/icons/chevron-left-white.svg" class="w-full h-full" />
+            </button>
+            <h1 class="font-semibold">Archived Chats</h1>
+          </header>
+        </menu>
         <nav
           id="conversations"
           class="@container flex h-full flex-col items-center gap-1 overflow-y-scroll bg-zinc-800 p-2"
         >
+          <button id="archived-button" class="w-full py-6 opacity-70 gap-2 hover:bg-opacity-10 bg-white bg-opacity-0 rounded-md flex justify-center items-center">
+            <img src="/icons/archive.svg" class="h-full" />
+            <h1 class="font-bold w-fit h-fit text-sm @[100px]:block hidden">Archived Chats</h1>
+            <span id="archived-count" class="w-4 @[100px]:flex hidden h-4 bg-white bg-opacity-10 text-white text-sm p-3 rounded-full justify-center items-center">0</span>
+          </button>
         </nav>
         <div
           data-resize-sidebar-handle
@@ -92,14 +108,7 @@ const { title } = Astro.props;
   handle.addEventListener("mousedown", resizer);
 
   $conversations.subscribe((conversations: Conversations) => {
-    conversationsList.innerHTML = "";
     conversationsList.innerHTML = `<h1 id="chats" class="font-semibold text-white @[100px]:bg-opacity-0 bg-opacity-40 bg-white @[100px]:w-full w-2/3 rounded-full p-[1px] my-2"><span class="hidden p-2 @[100px]:block">Chats</span></h1>` + conversationsList.innerHTML;
-    conversationsList.innerHTML += `
-    <button id="archived-button" class="w-full py-6 opacity-70 gap-2 hover:bg-opacity-10 bg-white bg-opacity-0 rounded-md flex justify-center items-center">
-      <img src="/icons/archive.svg" class="h-full" />
-      <h1 class="font-bold w-fit h-fit text-sm">Archived Chats</h1>
-      <span id="archived-count" class="w-4 h-4 bg-white bg-opacity-10 text-white text-sm p-3 rounded-full flex justify-center items-center">0</span>
-    </button>`
     const entries = Object.entries(conversations);
     let pinnedSectionExists = false;
     for (let i = 0; i < entries.length; i++) {
@@ -177,10 +186,7 @@ const { title } = Astro.props;
       else if (conversation.isArchived) {
         const count = document.querySelector("#archived-count")!;
         count.innerHTML = (parseInt(count.innerHTML) + 1).toString();
-        document.querySelector("#archived-button")!.insertAdjacentHTML(
-          "afterend",
-          element,
-        );
+        document.querySelector("#archived")!.innerHTML += element;
       } else {
         document.querySelector("#chats")!.insertAdjacentHTML(
           "afterend",
@@ -192,22 +198,6 @@ const { title } = Astro.props;
       "[data-colors]",
     ) as NodeListOf<HTMLElement>;
 
-    //     new Map([
-    //  [
-    //    'A100',
-    //    {
-    //      bg: '#e3e3fe',
-    //      fg: '#3838f5',
-    //    },
-    //  ],
-    //  [
-    //    'A110',
-    //    {
-    //      bg: '#dde7fc',
-    //      fg: '#1251d3',
-    //    },
-    //  ],
-    //  ])
     for (let i = 0; i < colorables.length; i++) {
       const colorable = colorables[i];
       const color = colorable.getAttribute("data-colors") as string;
@@ -221,4 +211,16 @@ const { title } = Astro.props;
       }
     }
   });
+  const archived = document.querySelector('#archived')!
+  const archivedButton = document.querySelector('#archived-button')!
+  archived.querySelector('header button')!.addEventListener('click', toggleArchive)
+  archivedButton.addEventListener('click', toggleArchive)
+  const conversations = document.querySelector('#conversations')!
+  function toggleArchive() {
+      archived.classList.toggle('hidden')
+      archived.classList.toggle('flex')
+      conversations.classList.toggle('hidden')
+      conversations.classList.toggle('flex')
+      handle.classList.toggle('pointer-events-none')
+    }
 </script>
