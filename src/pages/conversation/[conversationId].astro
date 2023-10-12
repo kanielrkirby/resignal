@@ -39,6 +39,7 @@ const { conversationId } = Astro.params;
     let prev: (typeof messages)[0] | undefined;
     for (let i = 0; i < elems.length; i++) {
       const m = messages[i];
+      let body = m.body
 
       if (m.conversationId !== conversationId) continue;
       if (!m.body && !m.attachments?.length) continue;
@@ -131,58 +132,77 @@ const { conversationId } = Astro.params;
           : "";
       const messageId = m.id;
 
-      // if m.body is a link (use regex)
-      const linkInBody = m.body.match(/https?:\/\/[^\s]+\.[^\s]+/);
+      const linkInBody = body ? body.match(/https?:\/\/[^\s\)]+/) : undefined;
+      if (linkInBody) console.log(linkInBody[0])
+      body = body.replaceAll(/\n/g, "<br />")
       if (linkInBody) {
-        (async () => {
-          const { image, title, description, url, published, error } = await getLink(linkInBody[0]);
-          if (error) {
-            console.error(error);
-          } else {
-            const linkElem = `
+        if (!hasVisualMedia) {
+          (async () => {
+            const { image, title, description, url, published, error } =
+              await getLink(linkInBody[0]);
+            if (error) {
+              console.error(error);
+            } else {
+              const linkElem = `
 <li id=${messageId} class="sm:w-[85%] md:w-[75%] lg:w-[65%] flex ${topLi} ${alignItems} ${align}">
   <div class="max-w-[90%] w-[20rem] h-fit shrink flex-col flex">
     <img src="${image}" alt="${title}" class="w-full object-cover rounded-md rounded-b-none" />
     <div class="justify-center flex overflow-hidden w-full cursor-pointer h-fit flex-wrap">
       <div class="bg-zinc-800 grow flex flex-col justify-between p-3 w-full">
         <div class="flex flex-col items-start">
-          ${title ? `<h1 class="text-base font-semibold">${title}</h1>`: ""}
-          <p class="text-sm opacity-90">${description}</p>
-          <span class="text-sm opacity-80">${url}</span>
-          ${published ? `<span class="text-xs opacity-80">${
-              // published is a timezone string
-              new Date(published).toLocaleDateString([], {
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-              })
-            }</span>` : ""}
+          ${title ? `<h1 class="text-base font-semibold">${title}</h1>` : ""}
+          ${description ? `<p class="text-sm opacity-90">${description}</p>` : ""}
+          ${url ? `<span class="text-sm opacity-80 underline">${url}</span>` : ""}
+          ${
+            published
+              ? `<span class="text-xs opacity-80">${
+                  // published is a timezone string
+                  new Date(published).toLocaleDateString([], {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })
+                }</span>`
+              : ""
+          }
         </div>
       </div>
     </div>
     <div class="${color} ${topInner} ${bottomInner} justify-end gap-3 text-[.91rem] px-3 py-2 rounded-2xl rounded-t-none text-white w-full flex">
-      <p class="overflow-hidden underline">${m.body}</p>
+      <p class="overflow-hidden underline">${body}</p>
       ${timestamp || ""}
     </div>
   </div>
 </li>
 `;
-            setTimeout(() => {
-              const linkLoc = document.querySelector(`#${messageId}`) as
-                | HTMLElement
-                | undefined;
-              if (linkLoc) {
-                linkLoc.outerHTML = linkElem;
-              }
-            }, 1000);
-          }
-        })();
-      } 
+
+              setTimeout(() => {
+                const linkLoc = document.querySelector(`#${messageId}`) as
+                  | HTMLElement
+                  | undefined;
+                if (linkLoc) {
+                  linkLoc.outerHTML = linkElem;
+                }
+              }, 1000);
+            }
+          })();
+        } else {
+          // has visual media
+          console.log("has visual media")
+          console.log(body)
+          console.log(linkInBody[0])
+          body = body.replace(
+            linkInBody[0],
+            `<a href="${linkInBody[0]}" target="_blank" class="underline">${linkInBody[0]}</a>`,
+          );
+          console.log(body)
+        }
+      }
 
       // message container
-      let colorContainer = m.body
+      let colorContainer = body
         ? `<div class="${color} ${topInner} ${bottomInner} justify-end gap-3 text-[.91rem] px-3 py-2 rounded-2xl text-white w-fit flex"><p class="overflow-hidden">${
-            m.body
+            body
           }</p>${timestamp || ""}</div>`
         : "";
       let elem = `<li id=${messageId} class="sm:w-[85%] md:w-[75%] lg:w-[65%] flex flex-col ${topLi} ${alignItems} ${align}">${media}${colorContainer}${audios}</li>`;
