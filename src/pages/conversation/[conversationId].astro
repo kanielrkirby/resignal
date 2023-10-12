@@ -62,24 +62,30 @@ const { conversationId } = Astro.params;
 
       // conversation identity styling
       const align = m.type === "incoming" ? "self-start" : "self-end";
+      const alignItems = align === "self-start" ? "items-start" : "items-end";
       const color = m.type === "incoming" ? "bg-neutral-700" : "bg-blue-600";
       let dateOrBlank = "";
 
       // attachments
-      let attachmentElements = "";
+      let imagesAndVideos = "";
+      let audios = "";
       let hasVisualMedia = false;
+      let severalMedia = false;
       for (let i = 0; i < m?.attachments?.length; i++) {
         const attachment = m.attachments[i];
         if (attachment.contentType.startsWith("image")) {
-          attachmentElements += `<img src="${attachment.url}" alt="Image, something went wrong." class="max-w-full max-h-96 rounded-md">`;
+          imagesAndVideos += `<img src="${attachment.url}" alt="Image, something went wrong." class="w-0 min-w-1/2 grow shrink max-h-96 rounded-md object-cover">`;
+          if (hasVisualMedia) severalMedia = true;
           hasVisualMedia = true;
         } else if (attachment.contentType.startsWith("video")) {
-          attachmentElements += `<video src="${attachment.url}" controls class="max-w-full max-h-96 rounded-md"></video>`;
+          imagesAndVideos += `<video src="${attachment.url}" controls class="w-0 min-w-1/2 grow shrink max-w-full max-h-96 rounded-md object-cover"></video>`;
+          if (hasVisualMedia) severalMedia = true;
           hasVisualMedia = true;
         } else if (attachment.contentType.startsWith("audio")) {
-          attachmentElements += `<audio src="${attachment.url}" controls class="rounded-md"></audio>`;
+          audios += `<audio src="${attachment.url}" controls class="rounded-md"></audio>`;
         }
       }
+      const media = severalMedia ? `<div class="flex gap-1 overflow-hidden w-full rounded-md flex-wrap">${imagesAndVideos}</div>` : imagesAndVideos;
 
       // timestamp grouping
       const groupPrev =
@@ -120,11 +126,11 @@ const { conversationId } = Astro.params;
 
       // message container
       let colorContainer = m.body
-        ? `<div class="${color} ${topInner} ${bottomInner} justify-end gap-3 text-[.91rem] px-3 py-2 rounded-2xl text-white w-fit self-end flex"><p class="overflow-hidden">${
+        ? `<div class="${color} ${topInner} ${bottomInner} justify-end gap-3 text-[.91rem] px-3 py-2 rounded-2xl text-white w-fit flex"><p class="overflow-hidden">${
             m.body
           }</p>${timestamp || ""}</div>`
         : "";
-      let elem = `<li class="max-w-[85%] flex flex-col ${topLi} ${align}">${attachmentElements}${colorContainer}</li>`;
+      let elem = `<li class="sm:w-[85%] md:w-[75%] lg:w-[65%] flex flex-col ${topLi} ${alignItems} ${align}">${media}${colorContainer}${audios}</li>`;
 
       // date grouping
       const messageDay = new Date(m.timestamp!).toLocaleDateString();
