@@ -65,7 +65,6 @@ html, body {
             
             ${
               conversation?.lastMessage &&
-              conversation?.lastMessage &&
               conversation?.timestamp &&
               `<span class="opacity-70 text-xs">
                 ${
@@ -78,7 +77,11 @@ html, body {
             <p class="opacity-70 text-sm text-ellipsis w-full">
               ${conversation.lastMessage || "No messages yet"}
             </p>
-            <img src="${location.origin}/icons/messagestatus-${conversation.lastMessageStatus?.toLowerCase() ?? "read"}.svg" class="w-4 h-fit" />
+            ${
+              conversation?.lastMessage ?
+              `<img src="${location.origin}/icons/messagestatus-${conversation.lastMessageStatus?.toLowerCase() ?? "read"}.svg" class="w-4 h-fit" />`
+              : ""
+            }
           </div>
         </div>
       </a>`;
