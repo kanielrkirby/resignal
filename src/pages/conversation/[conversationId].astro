@@ -132,16 +132,16 @@ const { conversationId } = Astro.params;
       const messageId = m.id;
 
       // if m.body is a link (use regex)
-      if (m.body?.match(/https?:\/\/[^\s]+\.[^\s]+/)) {
-        // get the link
+      const linkInBody = m.body.match(/https?:\/\/[^\s]+\.[^\s]+/);
+      if (linkInBody) {
         (async () => {
-          const { image, title, description, url, published, error } = await getLink(m.body);
+          const { image, title, description, url, published, error } = await getLink(linkInBody[0]);
           if (error) {
             console.error(error);
           } else {
             const linkElem = `
 <li id=${messageId} class="sm:w-[85%] md:w-[75%] lg:w-[65%] flex ${topLi} ${alignItems} ${align}">
-  <div class="min-w-1/2 h-fit w-0 grow shrink flex-col flex">
+  <div class="max-w-[90%] w-[20rem] h-fit shrink flex-col flex">
     <img src="${image}" alt="${title}" class="w-full object-cover rounded-md rounded-b-none" />
     <div class="justify-center flex overflow-hidden w-full cursor-pointer h-fit flex-wrap">
       <div class="bg-zinc-800 grow flex flex-col justify-between p-3 w-full">
