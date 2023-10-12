@@ -33,7 +33,7 @@ const { conversationId } = Astro.params;
 
   let day: Date;
 
-  $messages.subscribe((messages) => {
+  $messages.subscribe(async (messages) => {
     let elems = messages;
     let html = "";
     let prev: (typeof messages)[0] | undefined;
@@ -74,18 +74,20 @@ const { conversationId } = Astro.params;
       for (let i = 0; i < m?.attachments?.length; i++) {
         const attachment = m.attachments[i];
         if (attachment.contentType.startsWith("image")) {
-          imagesAndVideos += `<img src="${attachment.url}" alt="Image, something went wrong." class="w-0 min-w-1/2 grow shrink max-h-96 rounded-md object-cover">`;
+          imagesAndVideos += `<img src="${attachment.url}" alt="Image, something went wrong." class="w-0 min-w-1/2 grow shrink object-cover">`;
           if (hasVisualMedia) severalMedia = true;
           hasVisualMedia = true;
         } else if (attachment.contentType.startsWith("video")) {
-          imagesAndVideos += `<video src="${attachment.url}" controls class="w-0 min-w-1/2 grow shrink max-w-full max-h-96 rounded-md object-cover"></video>`;
+          imagesAndVideos += `<video src="${attachment.url}" controls class="w-0 min-w-1/2 grow shrink max-w-full max-h-96 object-cover"></video>`;
           if (hasVisualMedia) severalMedia = true;
           hasVisualMedia = true;
         } else if (attachment.contentType.startsWith("audio")) {
-          audios += `<audio src="${attachment.url}" controls class="rounded-md"></audio>`;
+          audios += `<audio src="${attachment.url}" controls class=""></audio>`;
         }
       }
-      const media = severalMedia ? `<div class="flex gap-1 overflow-hidden w-full rounded-md flex-wrap">${imagesAndVideos}</div>` : imagesAndVideos;
+      const media = `<div class="justify-center flex overflow-hidden max-w-[90%] cursor-pointer ${
+        severalMedia ? "w-[25rem] h-40" : "w-[16rem] h-fit"
+      } rounded-md flex-wrap rounded-md">${imagesAndVideos}</div>`;
 
       // timestamp grouping
       const groupPrev =
@@ -99,7 +101,11 @@ const { conversationId } = Astro.params;
         m?.timestamp &&
         next.timestamp - m.timestamp < 300000;
       const topLi = groupPrev ? "!mt-0.5" : "";
-      const topInner = groupNext ? align === "self-start" ? "rounded-bl-sm" : "rounded-br-sm" : "";
+      const topInner = groupNext
+        ? align === "self-start"
+          ? "rounded-bl-sm"
+          : "rounded-br-sm"
+        : "";
       const bottomInner = groupPrev
         ? hasVisualMedia
           ? "!rounded-t-none"
@@ -123,6 +129,48 @@ const { conversationId } = Astro.params;
               m.timestamp,
             )}${image}</span>`
           : "";
+      const messageId = m.id;
+
+      // if m.body is a link (use regex)
+      if (m.body?.match(/https?:\/\/[^\s]+\.[^\s]+/)) {
+        // get the link
+        (async () => {
+          const { image, title, description, url, published, error } = await getLink(m.body);
+          if (error) {
+            console.error(error);
+          } else {
+            const linkElem = `
+<li id=${messageId} class="sm:w-[85%] md:w-[75%] lg:w-[65%] flex ${topLi} ${alignItems} ${align}">
+  <div class="min-w-1/2 h-fit w-0 grow shrink flex-col flex">
+    <img src="${image}" alt="${title}" class="w-full object-cover rounded-md rounded-b-none" />
+    <div class="justify-center flex overflow-hidden w-full cursor-pointer h-fit flex-wrap">
+      <div class="bg-zinc-800 grow flex flex-col justify-between p-3 w-full">
+        <div class="flex flex-col gap-1 items-start">
+          ${title ? `<h1 class="text-base font-semibold">${title}</h1>`: ""}
+          <p class="text-sm opacity-90">${description}</p>
+          <span class="text-xs opacity-80">${url}</span>
+          <span class="text-xs opacity-80">${published}</span>
+        </div>
+      </div>
+    </div>
+    <div class="${color} ${topInner} ${bottomInner} justify-end gap-3 text-[.91rem] px-3 py-2 rounded-2xl rounded-t-none text-white w-full flex">
+      <p class="overflow-hidden underline">${m.body}</p>
+      ${timestamp || ""}
+    </div>
+  </div>
+</li>
+`;
+            setTimeout(() => {
+              const linkLoc = document.querySelector(`#${messageId}`) as
+                | HTMLElement
+                | undefined;
+              if (linkLoc) {
+                linkLoc.outerHTML = linkElem;
+              }
+            }, 1000);
+          }
+        })();
+      } 
 
       // message container
       let colorContainer = m.body
@@ -130,7 +178,7 @@ const { conversationId } = Astro.params;
             m.body
           }</p>${timestamp || ""}</div>`
         : "";
-      let elem = `<li class="sm:w-[85%] md:w-[75%] lg:w-[65%] flex flex-col ${topLi} ${alignItems} ${align}">${media}${colorContainer}${audios}</li>`;
+      let elem = `<li id=${messageId} class="sm:w-[85%] md:w-[75%] lg:w-[65%] flex flex-col ${topLi} ${alignItems} ${align}">${media}${colorContainer}${audios}</li>`;
 
       // date grouping
       const messageDay = new Date(m.timestamp!).toLocaleDateString();
@@ -173,6 +221,40 @@ const { conversationId } = Astro.params;
         hour: "numeric",
         minute: "2-digit",
       });
+    }
+  }
+  async function getLink(link: string) {
+    try {
+      const res = await fetch(
+        `https://corsproxy.io/?${encodeURIComponent(link)}`,
+      );
+      const html = await res.text();
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, "text/html");
+      const title = doc
+        .querySelector("meta[property='og:title']")
+        ?.getAttribute("content");
+      const description = doc
+        .querySelector("meta[property='og:description']")
+        ?.getAttribute("content");
+      const image = doc
+        .querySelector("meta[property='og:image']")
+        ?.getAttribute("content");
+      let url = doc
+        .querySelector("meta[property='og:url']")
+        ?.getAttribute("content");
+      if (url) {
+        // simplify the whole url from "https://asdfasdf.com/other/ptahs" to "asdfasdf.com"
+        url = url.replace(/https?:\/\//, "").replace(/\/.*/, "");
+      }
+      const published = doc
+        .querySelector("meta[property='article:published_time']")
+        ?.getAttribute("content");
+      return { title, description, image, url, published, error: undefined };
+    } catch (error) {
+      return {
+        error,
+      };
     }
   }
 </script>
