@@ -1,6 +1,6 @@
 ---
 interface Props {
-	title: string;
+  title: string;
 }
 
 const { title } = Astro.props;
@@ -8,101 +8,168 @@ const { title } = Astro.props;
 
 <!doctype html>
 <html lang="en" class="bg-neutral-900 text-white text-opacity-90">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="description" content="Astro description" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="generator" content={Astro.generator} />
-		<title>{title}</title>
-	</head>
-	<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="Astro description" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+  </head>
+  <body>
     <header></header>
     <div class="flex h-full">
-      <nav id="conversations" class="bg-zinc-800 flex flex-col p-2 gap-1 max-sm:hidden">
-        
-      </nav>
-      <slot />
+      <div class="flex h-full">
+        <nav
+          id="conversations"
+          class="flex h-full flex-col gap-1 overflow-y-scroll bg-zinc-800 p-2"
+        >
+        </nav>
+        <div
+          data-resize-handle="#conversations"
+          class="h-full w-2 cursor-ew-resize bg-white"
+        >
+        </div>
+      </div>
+      <main class="h-full w-full resize-x">
+        <slot />
+      </main>
     </div>
-	</body>
+  </body>
 </html>
 
 <style>
-html, body {
-  height: 100%;
-}
+  html,
+  body {
+    height: 100%;
+  }
 </style>
 
 <script>
-  import '../store/messages'
-  import { $conversations } from '../store/conversations';
-  import type { Conversation } from '../store/conversations';
-  import { timeSince } from '../utils/timeSince'
-  import { AvatarColorMap } from '../types/Colors'
-  const conversationsList = document.querySelector('#conversations')!;
-  type Conversations = Record<string, Conversation>
+  import "../store/messages";
+  import { $conversations } from "../store/conversations";
+  import type { Conversation } from "../store/conversations";
+  import { timeSince } from "../utils/timeSince";
+  import { AvatarColorMap } from "../types/Colors";
+  const conversationsList = document.querySelector("#conversations")!;
+  type Conversations = Record<string, Conversation>;
+
+  const handles = document.querySelectorAll("[data-resize-handle]");
+  for (let i = 0; i < handles.length; i++) {
+    const handle = handles[i];
+
+    const resizeValue = handle.getAttribute(
+      "data-resize-handle",
+    ) as string | null;
+
+    if (!resizeValue) continue;
+
+    const hook = document.querySelector(resizeValue) as HTMLElement | null;
+    if (!hook) continue;
+
+    const resize = (e: MouseEvent) => {
+      const width = e.clientX;
+      hook.style.width = `${width}px`;
+      document.addEventListener(
+        "mouseup",
+        () => {
+          document.removeEventListener("mousemove", resize);
+        },
+        { once: true },
+      );
+    };
+
+    function resizer() {
+      document.addEventListener("mousemove", resize);
+    }
+
+    handle.addEventListener("mousedown", resizer);
+  }
 
   $conversations.subscribe((conversations: Conversations) => {
     const entries = Object.entries(conversations);
     for (let i = 0; i < entries.length; i++) {
       const conversation = entries[i][1];
-      let imgSrc: string | undefined = undefined
+      let imgSrc: string | undefined = undefined;
       if (conversation.profileAvatar) {
         const pathSplit = conversation.profileAvatar.path.split("/")[1];
         const isSvg = pathSplit.endsWith(".svg");
-        imgSrc = `${location.origin}/${isSvg ? "icons" : "attachments"}/${pathSplit}${isSvg ? "" : ".jpeg"}`;
+        imgSrc = `${location.origin}/${
+          isSvg ? "icons" : "attachments"
+        }/${pathSplit}${isSvg ? "" : ".jpeg"}`;
       }
-      console.log(imgSrc)
-      const element = 
-      `<a href="/conversation/${conversation.id}" class="w-full gap-3 bg-white p-4 rounded-lg flex justify-between items-center ${location.pathname.split("/")[location.pathname.split("/").length - 1] === conversation.id ? "bg-opacity-10" : "bg-opacity-0 hover:bg-opacity-5"}"]>
-        ${imgSrc ? `<img src="${imgSrc}" class="w-12 h-12 rounded-full" />` : 
-        `<div data-colors="${conversation.color || "null"}" class="flex justify-center items-center text-xl w-12 shrink-0 h-12 rounded-full">${conversation.conversationTitle && conversation.conversationTitle[0] || "N"}</div>`}
+      console.log(imgSrc);
+      const element = `<a href="/conversation/${
+        conversation.id
+      }" class="w-full gap-3 bg-white p-2 rounded-lg flex justify-between items-center ${
+        location.pathname.split("/")[
+          location.pathname.split("/").length - 1
+        ] === conversation.id
+          ? "bg-opacity-10"
+          : "bg-opacity-0 hover:bg-opacity-5"
+      }"]>
+        ${
+          imgSrc
+            ? `<img src="${imgSrc}" class="w-12 h-12 rounded-full" />`
+            : `<div data-colors="${
+                conversation.color || "null"
+              }" class="flex justify-center items-center text-xl w-12 shrink-0 h-12 rounded-full">${
+                (conversation.conversationTitle &&
+                  conversation.conversationTitle[0]) ||
+                "N"
+              }</div>`
+        }
         <div class="flex flex-col w-full overflow-x-hidden">
           <div class="flex justify-between w-full">
-            <h1 class="font-semibold">
+            <h1 class="font-semibold text-ellipses">
             ${conversation.conversationTitle}
             </h1>
             
             ${
-              conversation?.lastMessage &&
-              conversation?.timestamp &&
-              `<span class="opacity-70 text-xs">
+              (conversation?.lastMessage &&
+                conversation?.timestamp &&
+                `<span class="opacity-70 text-xs whitespace-nowrap">
                   ${timeSince(conversation?.timestamp) ?? ""}
-              </span>` || ""
+              </span>`) ||
+              ""
             }
           </div>
           <div class="flex gap-2 w-full">
-            <p class="opacity-70 text-sm text-ellipsis w-full">
+            <p class="opacity-70 text-sm text-ellipsis w-full max-h-[3rem] [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical]">
               ${conversation.lastMessage || "No messages yet"}
             </p>
             ${
-              conversation?.lastMessage ?
-              `<img src="${location.origin}/icons/messagestatus-${conversation.lastMessageStatus?.toLowerCase() ?? "read"}.svg" class="w-4 h-fit" />`
-              : ""
+              conversation?.lastMessage
+                ? `<img src="${location.origin}/icons/messagestatus-${
+                    conversation.lastMessageStatus?.toLowerCase() ?? "read"
+                  }.svg" class="w-4 h-fit" />`
+                : ""
             }
           </div>
         </div>
       </a>`;
       conversationsList.innerHTML += element;
     }
-    const colorables = document.querySelectorAll("[data-colors]") as NodeListOf<HTMLElement>;
+    const colorables = document.querySelectorAll(
+      "[data-colors]",
+    ) as NodeListOf<HTMLElement>;
 
-//     new Map([
-//  [
-//    'A100',
-//    {
-//      bg: '#e3e3fe',
-//      fg: '#3838f5',
-//    },
-//  ],
-//  [
-//    'A110',
-//    {
-//      bg: '#dde7fc',
-//      fg: '#1251d3',
-//    },
-//  ],
-//  ])
+    //     new Map([
+    //  [
+    //    'A100',
+    //    {
+    //      bg: '#e3e3fe',
+    //      fg: '#3838f5',
+    //    },
+    //  ],
+    //  [
+    //    'A110',
+    //    {
+    //      bg: '#dde7fc',
+    //      fg: '#1251d3',
+    //    },
+    //  ],
+    //  ])
     for (let i = 0; i < colorables.length; i++) {
       const colorable = colorables[i];
       const color = colorable.getAttribute("data-colors") as string;
@@ -111,7 +178,7 @@ html, body {
         colorable.style.backgroundColor = "#111";
         colorable.style.color = "#fff";
       } else {
-        colorable.style.backgroundColor = colors?.bg
+        colorable.style.backgroundColor = colors?.bg;
         colorable.style.color = colors?.fg;
       }
     }
