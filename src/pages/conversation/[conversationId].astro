@@ -24,19 +24,19 @@ const { conversationId } = Astro.params;
   const tempset = document.querySelector(
     "#temp-conversation-id",
   ) as HTMLElement;
-  const conversationId = tempset.dataset.id as string
+  const conversationId = tempset.dataset.id as string;
   tempset.remove();
 
   const listElem = (document.querySelector("#messages") as HTMLElement)!;
 
-  const conversation = $conversations.get()[conversationId]
+  const conversation = $conversations.get()[conversationId];
 
   let day: Date;
 
   $messages.subscribe((messages) => {
     let elems = messages;
     let html = "";
-    let prev: typeof messages[0] | undefined;
+    let prev: (typeof messages)[0] | undefined;
     for (let i = 0; i < elems.length; i++) {
       const m = messages[i];
 
@@ -44,16 +44,21 @@ const { conversationId } = Astro.params;
       if (!m.body && !m.attachments?.length) continue;
 
       // find next message in conversation
-      let next: typeof m | undefined = undefined
-      let j = 0
+      let next: typeof m | undefined = undefined;
+      let j = 0;
       function tryNext() {
-        j++
+        j++;
         next = messages[i + j];
-        if (!next || next.body === conversation.lastMessage || next.timestamp - m.timestamp > 300000) return
+        if (
+          !next ||
+          next.body === conversation.lastMessage ||
+          next.timestamp - m.timestamp > 300000
+        )
+          return;
         if (next?.conversationId !== conversationId) return tryNext();
-        return
+        return;
       }
-      if (m.body !== conversation.lastMessage) tryNext()
+      if (m.body !== conversation.lastMessage) tryNext();
 
       // conversation identity styling
       const align = m.type === "incoming" ? "self-start" : "self-end";
@@ -61,16 +66,27 @@ const { conversationId } = Astro.params;
       let dateOrBlank = "";
 
       // timestamp grouping
-      let topLi = "";
-      let topInner = "";
-      let bottomInner = "";
-      if (m?.type === prev?.type && prev?.timestamp && m?.timestamp && m.timestamp - prev.timestamp < 300000) {
-        topLi = "!mt-0.5"
-        topInner = align === "self-start" ? "rounded-tl-sm" : "rounded-tr-sm"
-      } 
-      if (next?.type === m?.type && next?.timestamp && m?.timestamp && next.timestamp - m.timestamp < 300000) {
-        bottomInner = align === "self-start" ? "rounded-bl-sm" : "rounded-br-sm"
-      }
+      const groupPrev =
+        m?.type === prev?.type &&
+        prev?.timestamp &&
+        m?.timestamp &&
+        m.timestamp - prev.timestamp < 300000;
+      const groupNext =
+        m?.type === next?.type &&
+        next?.timestamp &&
+        m?.timestamp &&
+        next.timestamp - m.timestamp < 300000;
+      const topLi = groupPrev ? "!mt-0.5" : "";
+      const topInner = groupNext
+        ? align === "self-start"
+          ? "rounded-bl-sm"
+          : "rounded-br-sm"
+        : "";
+      const bottomInner = groupPrev
+        ? align === "self-start"
+          ? "rounded-tl-sm"
+          : "rounded-tr-sm"
+        : "";
 
       // message status styling
       let status =
@@ -81,9 +97,11 @@ const { conversationId } = Astro.params;
       let image = `<img src="/icons/messagestatus-${status}.svg" alt="${status}" class="w-4 opacity-90 shrink-0">`;
 
       // timestamp styling
-      const timestamp = m.timestamp ? `<span class="whitespace-nowrap flex text-xs opacity-80 self-end justify-self-end items-center gap-1 shrink-0">${
-        getTimestamp(m.timestamp)
-      }${image}</span>` : "";
+      const timestamp = m.timestamp && !groupNext
+        ? `<span class="whitespace-nowrap flex text-xs opacity-80 self-end justify-self-end items-center gap-1 shrink-0">${getTimestamp(
+            m.timestamp,
+          )}${image}</span>`
+        : "";
 
       // attachments
       let attachmentElements = "";
@@ -99,9 +117,11 @@ const { conversationId } = Astro.params;
       }
 
       // message container
-      let colorContainer = m.body ? `<div class="${color} ${topInner} ${bottomInner} justify-end gap-3 text-[.91rem] px-3 py-2 rounded-2xl text-white w-fit self-end flex"><p class="overflow-hidden">${m.body}</p>${
-          timestamp || ""
-        }${attachmentElements}</div>` : ""
+      let colorContainer = m.body
+        ? `<div class="${color} ${topInner} ${bottomInner} justify-end gap-3 text-[.91rem] px-3 py-2 rounded-2xl text-white w-fit self-end flex"><p class="overflow-hidden">${
+            m.body
+          }</p>${timestamp || ""}${attachmentElements}</div>`
+        : "";
       let elem = `<li class="max-w-[85%] ${topLi} ${align}">${colorContainer}</li>`;
 
       // date grouping
@@ -126,7 +146,7 @@ const { conversationId } = Astro.params;
         dateOrBlank = `<li class="text-center text-sm opacity-95">${date}</li>`;
       }
 
-      prev = m
+      prev = m;
       html += dateOrBlank;
       html += elem;
     }
@@ -148,4 +168,3 @@ const { conversationId } = Astro.params;
     }
   }
 </script>
-
