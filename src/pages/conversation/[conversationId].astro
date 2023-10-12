@@ -120,9 +120,9 @@ const { conversationId } = Astro.params;
       let colorContainer = m.body
         ? `<div class="${color} ${topInner} ${bottomInner} justify-end gap-3 text-[.91rem] px-3 py-2 rounded-2xl text-white w-fit self-end flex"><p class="overflow-hidden">${
             m.body
-          }</p>${timestamp || ""}${attachmentElements}</div>`
+          }</p>${timestamp || ""}</div>`
         : "";
-      let elem = `<li class="max-w-[85%] ${topLi} ${align}">${colorContainer}</li>`;
+      let elem = `<li class="max-w-[85%] flex flex-col ${topLi} ${align}">${colorContainer}${attachmentElements}</li>`;
 
       // date grouping
       const messageDay = new Date(m.timestamp!).toLocaleDateString();
