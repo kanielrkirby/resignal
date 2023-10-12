@@ -70,7 +70,8 @@ const { title } = Astro.props;
     maxWidth = 380
     let width = e.clientX;
     if (minWidth !== undefined && maxWidth !== undefined) {
-      if (width > maxWidth) width = maxWidth
+      if (width < 100) width = 96
+      else if (width > maxWidth) width = maxWidth
       else if (width < minWidth) width = minWidth
       hook!.style.width = `${width}px`;
     }
