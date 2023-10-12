@@ -25,3 +25,5 @@ messages.json
 conversations.json
 other_data.json
 Signal
+
+conversations_template.json
