@@ -1,11 +1,10 @@
 export function timeSince(date: number) {
+  console.log("___________________")
+  console.log(date)
+  console.log(new Date().getTime())
+  console.log(new Date().getTime() - date / 1000)
+  console.log("___________________")
   const seconds = Math.floor((new Date().getTime() - date) / 1000);
-  if (seconds > 2419200) {
-    return new Date(date).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-    });
-  }
   if (seconds > 86400 && seconds < 604800) {
     return new Date(date).toLocaleDateString("en-US", {
       weekday: "long",
@@ -18,6 +17,10 @@ export function timeSince(date: number) {
     return `${Math.floor(seconds / 60)}m`;
   }
   if (seconds < 60) {
-    return "Just now";
+    return "now";
   }
+  return new Date(date).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  });
 }

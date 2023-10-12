@@ -68,7 +68,12 @@ html, body {
               conversation?.timestamp &&
               `<span class="opacity-70 text-xs">
                 ${
-                  timeSince(conversation?.timestamp)
+                  (() => {
+                    console.log(conversation.conversationTitle)
+                  const time =  timeSince(conversation?.timestamp)
+                  if (time) return time
+                  else return ""
+                  })()
                 }
               </span>` || ""
             }
