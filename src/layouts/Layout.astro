@@ -92,13 +92,15 @@ const { title } = Astro.props;
   handle.addEventListener("mousedown", resizer);
 
   $conversations.subscribe((conversations: Conversations) => {
+    conversationsList.innerHTML = "";
+    conversationsList.innerHTML = `<h1 id="chats" class="font-semibold text-white @[100px]:bg-opacity-0 bg-opacity-40 bg-white @[100px]:w-full w-2/3 rounded-full p-[1px] my-2"><span class="hidden p-2 @[100px]:block">Chats</span></h1>` + conversationsList.innerHTML;
     const entries = Object.entries(conversations);
     let pinnedSectionExists = false;
     for (let i = 0; i < entries.length; i++) {
       const conversation = entries[i][1];
       if (conversation.isPinned) {
         if (!pinnedSectionExists) {
-          conversationsList.innerHTML = `<h1 class="font-semibold text-white @[100px]:bg-opacity-0 bg-opacity-40 bg-white @[100px]:w-full w-2/3 rounded-full p-[1px]"><span class="hidden p-2 @[100px]:block">Pinned</span></h1>` + conversationsList.innerHTML;
+          conversationsList.innerHTML = `<h1 id="pinned" class="font-semibold text-white @[100px]:bg-opacity-0 bg-opacity-40 bg-white @[100px]:w-full w-2/3 rounded-full p-[1px] my-2"><span class="hidden p-2 @[100px]:block">Pinned</span></h1>` + conversationsList.innerHTML;
           pinnedSectionExists = true;
         }
       }
@@ -160,7 +162,17 @@ const { title } = Astro.props;
           </div>
         </div>
       </a>`;
-      conversationsList.innerHTML += element;
+      if (conversation.isPinned) {
+        document.querySelector("#pinned")!.insertAdjacentHTML(
+          "afterend",
+          element,
+        );
+      } else {
+        document.querySelector("#chats")!.insertAdjacentHTML(
+          "afterend",
+          element,
+        );
+      }
     }
     const colorables = document.querySelectorAll(
       "[data-colors]",
