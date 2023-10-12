@@ -22,7 +22,7 @@ const { title } = Astro.props;
       <div class="flex h-full">
         <nav
           id="conversations"
-          class="flex h-full flex-col gap-1 overflow-y-scroll bg-zinc-800 p-2"
+          class="@container flex h-full flex-col items-center gap-1 overflow-y-scroll bg-zinc-800 p-2"
         >
         </nav>
         <div
@@ -93,8 +93,15 @@ const { title } = Astro.props;
 
   $conversations.subscribe((conversations: Conversations) => {
     const entries = Object.entries(conversations);
+    let pinnedSectionExists = false;
     for (let i = 0; i < entries.length; i++) {
       const conversation = entries[i][1];
+      if (conversation.isPinned) {
+        if (!pinnedSectionExists) {
+          conversationsList.innerHTML = `<h1 class="font-semibold text-white @[100px]:bg-opacity-0 bg-opacity-40 bg-white @[100px]:w-full w-2/3 rounded-full p-[1px]"><span class="hidden p-2 @[100px]:block">Pinned</span></h1>` + conversationsList.innerHTML;
+          pinnedSectionExists = true;
+        }
+      }
       let imgSrc: string | undefined = undefined;
       if (conversation.profileAvatar) {
         const pathSplit = conversation.profileAvatar.path.split("/")[1];
