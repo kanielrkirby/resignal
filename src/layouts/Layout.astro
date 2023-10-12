@@ -67,14 +67,7 @@ html, body {
               conversation?.lastMessage &&
               conversation?.timestamp &&
               `<span class="opacity-70 text-xs">
-                ${
-                  (() => {
-                    console.log(conversation.conversationTitle)
-                  const time =  timeSince(conversation?.timestamp)
-                  if (time) return time
-                  else return ""
-                  })()
-                }
+                  ${timeSince(conversation?.timestamp) ?? ""}
               </span>` || ""
             }
           </div>

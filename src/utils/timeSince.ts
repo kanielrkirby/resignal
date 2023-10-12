@@ -1,9 +1,4 @@
 export function timeSince(date: number) {
-  console.log("___________________")
-  console.log(date)
-  console.log(new Date().getTime())
-  console.log(new Date().getTime() - date / 1000)
-  console.log("___________________")
   const seconds = Math.floor((new Date().getTime() - date) / 1000);
   if (seconds > 86400 && seconds < 604800) {
     return new Date(date).toLocaleDateString("en-US", {
