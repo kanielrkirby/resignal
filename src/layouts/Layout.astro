@@ -12,7 +12,7 @@ const { title } = Astro.props;
     <meta charset="UTF-8" />
     <meta name="description" content="Astro description" />
     <meta name="viewport" content="width=device-width" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg" href="/icons/titlebar_icon.svg" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
   </head>
@@ -22,31 +22,40 @@ const { title } = Astro.props;
       <div class="flex h-full">
         <menu
           id="archived"
-          class="hidden flex-col items-center gap-1 overflow-y-scroll bg-zinc-800 p-2 w-[300px]"
+          class="hidden w-[300px] flex-col items-center gap-1 overflow-y-scroll bg-zinc-800 p-2"
         >
-          <header class="flex mb-4 p-2 justify-center items-center relative w-full h-fit opacity-90">
-            <button class="top-0 bottom-0 my-auto left-0 absolute bg-white bg-opacity-0 hover:bg-opacity-10 p-2 rounded-md">
-              <img src="/icons/chevron-left-white.svg" class="w-full h-full" />
+          <header
+            class="relative mb-4 flex h-fit w-full items-center justify-center p-2 opacity-90"
+          >
+            <button
+              class="absolute bottom-0 left-0 top-0 my-auto rounded-md bg-white bg-opacity-0 p-2 hover:bg-opacity-10"
+            >
+              <img src="/icons/chevron-left-white.svg" class="h-full w-full" />
             </button>
             <h1 class="font-semibold">Archived Chats</h1>
           </header>
         </menu>
         <nav
           id="conversations"
-          class="@container flex h-full flex-col items-center gap-1 overflow-y-scroll bg-zinc-800 p-2"
+          class="flex h-full flex-col items-center gap-1 overflow-y-scroll bg-zinc-800 p-2 @container"
         >
-          <button id="archived-button" class="w-full py-6 opacity-70 gap-2 hover:bg-opacity-10 bg-white bg-opacity-0 rounded-md flex justify-center items-center">
+          <button
+            id="archived-button"
+            class="flex w-full items-center justify-center gap-2 rounded-md bg-white bg-opacity-0 py-6 opacity-70 hover:bg-opacity-10"
+          >
             <img src="/icons/archive.svg" class="h-full" />
-            <h1 class="font-bold w-fit h-fit text-sm @[100px]:block hidden">Archived Chats</h1>
-            <span id="archived-count" class="w-4 @[100px]:flex hidden h-4 bg-white bg-opacity-10 text-white text-sm p-3 rounded-full justify-center items-center">0</span>
+            <h1 class="hidden h-fit w-fit text-sm font-bold @[100px]:block">
+              Archived Chats
+            </h1>
+            <span
+              id="archived-count"
+              class="hidden h-4 w-4 items-center justify-center rounded-full bg-white bg-opacity-10 p-3 text-sm text-white @[100px]:flex"
+              >0</span
+            >
           </button>
         </nav>
-        <div
-          data-resize-sidebar-handle
-          class="h-full w-3 cursor-ew-resize"
-        >
-        <div class="w-[.5px] bg-white opacity-30 h-full">
-        </div>
+        <div data-resize-sidebar-handle class="h-full w-3 cursor-ew-resize">
+          <div class="h-full w-[.5px] bg-white opacity-30"></div>
         </div>
       </div>
       <main class="h-full w-full resize-x">
@@ -72,23 +81,26 @@ const { title } = Astro.props;
   const conversationsList = document.querySelector("#conversations")!;
   type Conversations = Record<string, Conversation>;
 
-  const handle = document.querySelector("[data-resize-sidebar-handle]") as HTMLElement;
-  const hook = document.querySelector("#conversations") as HTMLElement
-  const savedWidth = parseInt(localStorage.getItem("sidebar-width") || "300") ?? 300;
-  hook.style.width = `${savedWidth}px`
+  const handle = document.querySelector(
+    "[data-resize-sidebar-handle]",
+  ) as HTMLElement;
+  const hook = document.querySelector("#conversations") as HTMLElement;
+  const savedWidth =
+    parseInt(localStorage.getItem("sidebar-width") || "300") ?? 300;
+  hook.style.width = `${savedWidth}px`;
 
-  let minWidth: number | undefined = undefined
-  let maxWidth: number | undefined = undefined
+  let minWidth: number | undefined = undefined;
+  let maxWidth: number | undefined = undefined;
 
   const resize = (e: MouseEvent) => {
     e.preventDefault();
-    minWidth = 300
-    maxWidth = 380
+    minWidth = 300;
+    maxWidth = 380;
     let width = e.clientX;
     if (minWidth !== undefined && maxWidth !== undefined) {
-      if (width < 100) width = 96
-      else if (width > maxWidth) width = maxWidth
-      else if (width < minWidth) width = minWidth
+      if (width < 100) width = 96;
+      else if (width > maxWidth) width = maxWidth;
+      else if (width < minWidth) width = minWidth;
       hook!.style.width = `${width}px`;
     }
     document.addEventListener(
@@ -108,14 +120,18 @@ const { title } = Astro.props;
   handle.addEventListener("mousedown", resizer);
 
   $conversations.subscribe((conversations: Conversations) => {
-    conversationsList.innerHTML = `<h1 id="chats" class="font-semibold text-white @[100px]:bg-opacity-0 bg-opacity-40 bg-white @[100px]:w-full w-2/3 rounded-full p-[1px] my-2"><span class="hidden p-2 @[100px]:block">Chats</span></h1>` + conversationsList.innerHTML;
+    conversationsList.innerHTML =
+      `<h1 id="chats" class="font-semibold text-white @[100px]:bg-opacity-0 bg-opacity-40 bg-white @[100px]:w-full w-2/3 rounded-full p-[1px] my-2"><span class="hidden p-2 @[100px]:block">Chats</span></h1>` +
+      conversationsList.innerHTML;
     const entries = Object.entries(conversations);
     let pinnedSectionExists = false;
     for (let i = 0; i < entries.length; i++) {
       const conversation = entries[i][1];
       if (conversation.isPinned) {
         if (!pinnedSectionExists) {
-          conversationsList.innerHTML = `<h1 id="pinned" class="font-semibold text-white @[100px]:bg-opacity-0 bg-opacity-40 bg-white @[100px]:w-full w-2/3 rounded-full p-[1px] my-2"><span class="hidden p-2 @[100px]:block">Pinned</span></h1>` + conversationsList.innerHTML;
+          conversationsList.innerHTML =
+            `<h1 id="pinned" class="font-semibold text-white @[100px]:bg-opacity-0 bg-opacity-40 bg-white @[100px]:w-full w-2/3 rounded-full p-[1px] my-2"><span class="hidden p-2 @[100px]:block">Pinned</span></h1>` +
+            conversationsList.innerHTML;
           pinnedSectionExists = true;
         }
       }
@@ -178,20 +194,17 @@ const { title } = Astro.props;
         </div>
       </a>`;
       if (conversation.isPinned) {
-        document.querySelector("#pinned")!.insertAdjacentHTML(
-          "afterend",
-          element,
-        );
-      }
-      else if (conversation.isArchived) {
+        document
+          .querySelector("#pinned")!
+          .insertAdjacentHTML("afterend", element);
+      } else if (conversation.isArchived) {
         const count = document.querySelector("#archived-count")!;
         count.innerHTML = (parseInt(count.innerHTML) + 1).toString();
         document.querySelector("#archived")!.innerHTML += element;
       } else {
-        document.querySelector("#chats")!.insertAdjacentHTML(
-          "afterend",
-          element,
-        );
+        document
+          .querySelector("#chats")!
+          .insertAdjacentHTML("afterend", element);
       }
     }
     const colorables = document.querySelectorAll(
@@ -211,16 +224,18 @@ const { title } = Astro.props;
       }
     }
   });
-  const archived = document.querySelector('#archived')!
-  const archivedButton = document.querySelector('#archived-button')!
-  archived.querySelector('header button')!.addEventListener('click', toggleArchive)
-  archivedButton.addEventListener('click', toggleArchive)
-  const conversations = document.querySelector('#conversations')!
+  const archived = document.querySelector("#archived")!;
+  const archivedButton = document.querySelector("#archived-button")!;
+  archived
+    .querySelector("header button")!
+    .addEventListener("click", toggleArchive);
+  archivedButton.addEventListener("click", toggleArchive);
+  const conversations = document.querySelector("#conversations")!;
   function toggleArchive() {
-      archived.classList.toggle('hidden')
-      archived.classList.toggle('flex')
-      conversations.classList.toggle('hidden')
-      conversations.classList.toggle('flex')
-      handle.classList.toggle('pointer-events-none')
-    }
+    archived.classList.toggle("hidden");
+    archived.classList.toggle("flex");
+    conversations.classList.toggle("hidden");
+    conversations.classList.toggle("flex");
+    handle.classList.toggle("pointer-events-none");
+  }
 </script>
