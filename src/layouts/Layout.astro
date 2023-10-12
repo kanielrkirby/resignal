@@ -26,7 +26,7 @@ const { title } = Astro.props;
         >
         </nav>
         <div
-          data-resize-handle="#conversations"
+          data-resize-sidebar-handle
           class="h-full w-3 cursor-ew-resize"
         >
         <div class="w-[.5px] bg-white opacity-30 h-full">
@@ -56,37 +56,36 @@ const { title } = Astro.props;
   const conversationsList = document.querySelector("#conversations")!;
   type Conversations = Record<string, Conversation>;
 
-  const handles = document.querySelectorAll("[data-resize-handle]");
-  for (let i = 0; i < handles.length; i++) {
-    const handle = handles[i];
+  const handle = document.querySelector("[data-resize-sidebar-handle]") as HTMLElement;
+  const hook = document.querySelector("#conversations") as HTMLElement | null;
 
-    const resizeValue = handle.getAttribute(
-      "data-resize-handle",
-    ) as string | null;
+  let minWidth: number | undefined = undefined
+  let maxWidth: number | undefined = undefined
 
-    if (!resizeValue) continue;
-
-    const hook = document.querySelector(resizeValue) as HTMLElement | null;
-    if (!hook) continue;
-
-    const resize = (e: MouseEvent) => {
-      const width = e.clientX;
-      hook.style.width = `${width}px`;
-      document.addEventListener(
-        "mouseup",
-        () => {
-          document.removeEventListener("mousemove", resize);
-        },
-        { once: true },
-      );
-    };
-
-    function resizer() {
-      document.addEventListener("mousemove", resize);
+  const resize = (e: MouseEvent) => {
+    e.preventDefault();
+    minWidth = 300
+    maxWidth = 500
+    const width = e.clientX;
+    if (minWidth !== undefined && maxWidth !== undefined) {
+      if (width > maxWidth) hook!.style.width = `${maxWidth}px`
+      else if (width < minWidth) hook!.style.width = `${minWidth}px`
+      else hook!.style.width = `${width}px`;
     }
+    document.addEventListener(
+      "mouseup",
+      () => {
+        document.removeEventListener("mousemove", resize);
+      },
+      { once: true },
+    );
+  };
 
-    handle.addEventListener("mousedown", resizer);
+  function resizer() {
+    document.addEventListener("mousemove", resize);
   }
+
+  handle.addEventListener("mousedown", resizer);
 
   $conversations.subscribe((conversations: Conversations) => {
     const entries = Object.entries(conversations);
