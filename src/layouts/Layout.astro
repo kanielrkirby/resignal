@@ -57,7 +57,9 @@ const { title } = Astro.props;
   type Conversations = Record<string, Conversation>;
 
   const handle = document.querySelector("[data-resize-sidebar-handle]") as HTMLElement;
-  const hook = document.querySelector("#conversations") as HTMLElement | null;
+  const hook = document.querySelector("#conversations") as HTMLElement
+  const savedWidth = parseInt(localStorage.getItem("sidebar-width") || "300") ?? 300;
+  hook.style.width = `${savedWidth}px`
 
   let minWidth: number | undefined = undefined
   let maxWidth: number | undefined = undefined
@@ -65,16 +67,17 @@ const { title } = Astro.props;
   const resize = (e: MouseEvent) => {
     e.preventDefault();
     minWidth = 300
-    maxWidth = 500
-    const width = e.clientX;
+    maxWidth = 380
+    let width = e.clientX;
     if (minWidth !== undefined && maxWidth !== undefined) {
-      if (width > maxWidth) hook!.style.width = `${maxWidth}px`
-      else if (width < minWidth) hook!.style.width = `${minWidth}px`
-      else hook!.style.width = `${width}px`;
+      if (width > maxWidth) width = maxWidth
+      else if (width < minWidth) width = minWidth
+      hook!.style.width = `${width}px`;
     }
     document.addEventListener(
       "mouseup",
       () => {
+        localStorage.setItem("sidebar-width", width.toString());
         document.removeEventListener("mousemove", resize);
       },
       { once: true },
