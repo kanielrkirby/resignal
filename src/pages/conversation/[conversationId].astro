@@ -65,6 +65,22 @@ const { conversationId } = Astro.params;
       const color = m.type === "incoming" ? "bg-neutral-700" : "bg-blue-600";
       let dateOrBlank = "";
 
+      // attachments
+      let attachmentElements = "";
+      let hasVisualMedia = false;
+      for (let i = 0; i < m?.attachments?.length; i++) {
+        const attachment = m.attachments[i];
+        if (attachment.contentType.startsWith("image")) {
+          attachmentElements += `<img src="${attachment.url}" alt="Image, something went wrong." class="max-w-full max-h-96 rounded-md">`;
+          hasVisualMedia = true;
+        } else if (attachment.contentType.startsWith("video")) {
+          attachmentElements += `<video src="${attachment.url}" controls class="max-w-full max-h-96 rounded-md"></video>`;
+          hasVisualMedia = true;
+        } else if (attachment.contentType.startsWith("audio")) {
+          attachmentElements += `<audio src="${attachment.url}" controls class="rounded-md"></audio>`;
+        }
+      }
+
       // timestamp grouping
       const groupPrev =
         m?.type === prev?.type &&
@@ -77,13 +93,11 @@ const { conversationId } = Astro.params;
         m?.timestamp &&
         next.timestamp - m.timestamp < 300000;
       const topLi = groupPrev ? "!mt-0.5" : "";
-      const topInner = groupNext
-        ? align === "self-start"
-          ? "rounded-bl-sm"
-          : "rounded-br-sm"
-        : "";
+      const topInner = groupNext ? align === "self-start" ? "rounded-bl-sm" : "rounded-br-sm" : "";
       const bottomInner = groupPrev
-        ? align === "self-start"
+        ? hasVisualMedia
+          ? "!rounded-t-none"
+          : align === "self-start"
           ? "rounded-tl-sm"
           : "rounded-tr-sm"
         : "";
@@ -97,24 +111,12 @@ const { conversationId } = Astro.params;
       let image = `<img src="/icons/messagestatus-${status}.svg" alt="${status}" class="w-4 opacity-90 shrink-0">`;
 
       // timestamp styling
-      const timestamp = m.timestamp && !groupNext
-        ? `<span class="whitespace-nowrap flex text-xs opacity-80 self-end justify-self-end items-center gap-1 shrink-0">${getTimestamp(
-            m.timestamp,
-          )}${image}</span>`
-        : "";
-
-      // attachments
-      let attachmentElements = "";
-      for (let i = 0; i < m?.attachments?.length; i++) {
-        const attachment = m.attachments[i];
-        if (attachment.contentType.startsWith("image")) {
-          attachmentElements += `<img src="${attachment.url}" alt="Image, something went wrong." class="max-w-full max-h-96 rounded-md">`;
-        } else if (attachment.contentType.startsWith("video")) {
-          attachmentElements += `<video src="${attachment.url}" controls class="max-w-full max-h-96 rounded-md"></video>`;
-        } else if (attachment.contentType.startsWith("audio")) {
-          attachmentElements += `<audio src="${attachment.url}" controls class="rounded-md"></audio>`;
-        }
-      }
+      const timestamp =
+        m.timestamp && !groupNext
+          ? `<span class="whitespace-nowrap flex text-xs opacity-80 self-end justify-self-end items-center gap-1 shrink-0">${getTimestamp(
+              m.timestamp,
+            )}${image}</span>`
+          : "";
 
       // message container
       let colorContainer = m.body
@@ -122,7 +124,7 @@ const { conversationId } = Astro.params;
             m.body
           }</p>${timestamp || ""}</div>`
         : "";
-      let elem = `<li class="max-w-[85%] flex flex-col ${topLi} ${align}">${colorContainer}${attachmentElements}</li>`;
+      let elem = `<li class="max-w-[85%] flex flex-col ${topLi} ${align}">${attachmentElements}${colorContainer}</li>`;
 
       // date grouping
       const messageDay = new Date(m.timestamp!).toLocaleDateString();
