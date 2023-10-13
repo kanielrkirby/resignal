@@ -18,11 +18,11 @@ const { title } = Astro.props;
   </head>
   <body>
     <header></header>
-    <div class="flex h-full">
-      <div class="flex h-full">
+    <div class="flex h-full max-sm:!w-full">
+      <div id="menu-area" class="flex h-full max-sm:!w-full">
         <menu
           id="archived"
-          class="hidden w-[300px] flex-col items-center gap-1 overflow-y-scroll bg-zinc-800 p-2 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-[#ffffff80] scrollbar-rounded-md"
+          class="hidden w-[300px] flex-col items-center gap-1 overflow-y-scroll bg-zinc-800 p-2 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-[#ffffff80] scrollbar-rounded-md max-sm:!w-full"
         >
           <header
             class="relative mb-4 flex h-fit w-full items-center justify-center p-2 opacity-90"
@@ -37,7 +37,7 @@ const { title } = Astro.props;
         </menu>
         <nav
           id="conversations"
-          class="flex pr-0 h-full flex-col items-center gap-1 overflow-y-scroll bg-zinc-800 p-2 @container scrollbar-thin scrollbar-track-transparent scrollbar-thumb-[#ffffff80] scrollbar-rounded-md"
+          class="flex pr-0 h-full flex-col items-center gap-1 overflow-y-scroll bg-zinc-800 p-2 @container scrollbar-thin scrollbar-track-transparent scrollbar-thumb-[#ffffff80] scrollbar-rounded-md max-sm:!w-full"
         >
           <h1 id="chats" class="font-semibold text-white @[100px]:bg-opacity-0 bg-opacity-40 bg-white @[100px]:w-full w-2/3 rounded-full p-[1px] my-2"><span class="hidden p-2 @[100px]:block">Chats</span></h1>
           <button
@@ -55,11 +55,11 @@ const { title } = Astro.props;
             >
           </button>
         </nav>
-        <div data-resize-sidebar-handle class="h-full w-3 cursor-ew-resize">
+        <div data-resize-sidebar-handle class="h-full w-3 cursor-ew-resize max-sm:!hidden">
           <div class="h-full w-[.5px] bg-white opacity-30"></div>
         </div>
       </div>
-      <main class="h-full w-full resize-x">
+      <main class="h-full w-full resize-x max-sm:hidden">
         <slot />
       </main>
     </div>
@@ -76,6 +76,12 @@ const { title } = Astro.props;
 <script>
   import "../store/messages";
   import { $conversations } from "../store/conversations";
+  if (location.pathname.startsWith("/conversation/")) {
+    document.querySelector("#menu-area")!.classList.add("!hidden");
+    document.querySelector("main")!.classList.remove("max-sm:hidden")
+    // skip the rest of the code:
+    throw new Error("Skipping code");
+  }
   import type { Conversation } from "../store/conversations";
   import { timeSince } from "../utils/timeSince";
   import { AvatarColorMap } from "../types/Colors";
