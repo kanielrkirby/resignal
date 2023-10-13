@@ -3,7 +3,7 @@ interface Props {
   title: string;
 }
 
-const { title } = Astro.props;
+const { title = "Signal Reader" } = Astro.props;
 ---
 
 <!doctype html>
@@ -17,7 +17,11 @@ const { title } = Astro.props;
     <title>{title}</title>
   </head>
   <body>
-    <header></header>
+    <header class="h-fit">
+      <a href="/" class="hidden sm:hidden" id="back-to-conversations" >
+        <img src="/icons/chevron-left-white.svg" class="h-8 w-8 hover:bg-opacity-10 bg-opacity-0 bg-white rounded-md"/>
+      </a>
+    </header>
     <div class="flex h-full max-sm:!w-full">
       <div id="menu-area" class="flex h-full max-sm:!w-full">
         <menu
@@ -77,9 +81,12 @@ const { title } = Astro.props;
   import "../store/messages";
   import { $conversations } from "../store/conversations";
   if (location.pathname.startsWith("/conversation/")) {
-    document.querySelector("#menu-area")!.classList.add("!hidden");
+    document.querySelector("#menu-area")!.classList.add("max-sm:!hidden");
     document.querySelector("main")!.classList.remove("max-sm:hidden")
-    // skip the rest of the code:
+    document.querySelector("#back-to-conversations")!.classList.remove("hidden")
+    document.querySelector("#back-to-conversations")!.addEventListener("click", () => {
+      history.back()
+    })
     throw new Error("Skipping code");
   }
   import type { Conversation } from "../store/conversations";
