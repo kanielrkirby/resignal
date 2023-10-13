@@ -11,12 +11,13 @@ const { conversationId } = Astro.params;
 <Layout title="Messages">
   <ul
     id="messages"
-    class="flex h-full w-full flex-col space-y-4 overflow-y-scroll p-4"
+    class="flex h-full w-full flex-col space-y-4 overflow-y-scroll p-4 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-[#ffffff80] scrollbar-thumb-rounded-lg"
   >
   </ul>
 
   <span id="temp-conversation-id" data-id={conversationId}></span>
 </Layout>
+
 <script>
   import { $messages } from "../../store/messages";
   import { $conversations } from "../../store/conversations";
