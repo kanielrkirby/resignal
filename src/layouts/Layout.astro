@@ -39,6 +39,7 @@ const { title } = Astro.props;
           id="conversations"
           class="flex h-full flex-col items-center gap-1 overflow-y-scroll bg-zinc-800 p-2 @container"
         >
+          <h1 id="chats" class="font-semibold text-white @[100px]:bg-opacity-0 bg-opacity-40 bg-white @[100px]:w-full w-2/3 rounded-full p-[1px] my-2"><span class="hidden p-2 @[100px]:block">Chats</span></h1>
           <button
             id="archived-button"
             class="flex w-full items-center justify-center gap-2 rounded-md bg-white bg-opacity-0 py-6 opacity-70 hover:bg-opacity-10"
@@ -120,9 +121,6 @@ const { title } = Astro.props;
   handle.addEventListener("mousedown", resizer);
 
   $conversations.subscribe((conversations: Conversations) => {
-    conversationsList.innerHTML =
-      `<h1 id="chats" class="font-semibold text-white @[100px]:bg-opacity-0 bg-opacity-40 bg-white @[100px]:w-full w-2/3 rounded-full p-[1px] my-2"><span class="hidden p-2 @[100px]:block">Chats</span></h1>` +
-      conversationsList.innerHTML;
     const entries = Object.entries(conversations);
     let pinnedSectionExists = false;
     for (let i = 0; i < entries.length; i++) {
@@ -186,7 +184,7 @@ const { title } = Astro.props;
             ${
               conversation?.lastMessage
                 ? `<img src="${location.origin}/icons/messagestatus-${
-                    conversation.lastMessageStatus?.toLowerCase() ?? "read"
+                    getStatus(conversation)
                   }.svg" class="w-4 h-fit opacity-70" />`
                 : ""
             }
@@ -237,5 +235,10 @@ const { title } = Astro.props;
     conversations.classList.toggle("hidden");
     conversations.classList.toggle("flex");
     handle.classList.toggle("pointer-events-none");
+  }
+  function getStatus(conversation: Conversation) {
+    let status = conversation.lastMessageStatus?.toLowerCase()
+    if (status === "viewed") status = undefined
+    return status || "read"
   }
 </script>
