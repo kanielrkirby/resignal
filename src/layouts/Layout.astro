@@ -125,6 +125,7 @@ const { title } = Astro.props;
     let pinnedSectionExists = false;
     for (let i = 0; i < entries.length; i++) {
       const conversation = entries[i][1];
+      if (conversation.conversationTitle === "Signal" && conversation.lastMessage === undefined && conversation?.profileAvatar?.path === "images/profile-avatar.svg") continue
       if (conversation.isPinned) {
         if (!pinnedSectionExists) {
           conversationsList.innerHTML =
@@ -141,7 +142,8 @@ const { title } = Astro.props;
           isSvg ? "icons" : "attachments"
         }/${pathSplit}${isSvg ? "" : ".jpeg"}`;
       }
-      console.log(imgSrc);
+      if (i === 0) imgSrc = "/icons/note.svg"
+      const conversationTitle = i === 0 ? "Note to self" : conversation.conversationTitle
       const element = `<a href="/conversation/${
         conversation.id
       }" class="w-full gap-3 bg-white px-4 py-2 rounded-lg flex justify-between items-center ${
@@ -153,19 +155,19 @@ const { title } = Astro.props;
       }"]>
         ${
           imgSrc
-            ? `<img src="${imgSrc}" class="w-12 h-12 rounded-full" />`
+            ? `<img src="${imgSrc}" class="w-12 h-12 rounded-full ${i === 0 ? "bg-gray-300 p-2" : ""}" />`
             : `<div data-colors="${
                 conversation.color || "null"
               }" class="flex justify-center items-center text-xl w-12 shrink-0 h-12 rounded-full">${
-                (conversation.conversationTitle &&
-                  conversation.conversationTitle[0]) ||
+                (conversationTitle &&
+                  conversationTitle[0]) ||
                 "N"
               }</div>`
         }
         <div class="flex flex-col w-full overflow-x-hidden">
           <div class="flex justify-between w-full">
-            <h1 class="font-semibold text-[.90rem] text-ellipses">
-            ${conversation.conversationTitle}
+            <h1 class="font-semibold text-[.90rem] text-ellipses [display:-webkit-box] [-webkit-line-clamp:1] [-webkit-box-orient:vertical]">
+              ${conversationTitle}
             </h1>
             
             ${
