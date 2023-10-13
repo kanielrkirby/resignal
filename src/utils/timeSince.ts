@@ -2,7 +2,7 @@ export function timeSince(date: number) {
   const seconds = Math.floor((new Date().getTime() - date) / 1000);
   if (seconds > 86400 && seconds < 604800) {
     return new Date(date).toLocaleDateString("en-US", {
-      weekday: "long",
+      weekday: "short",
     });
   }
   if (seconds > 3600 && seconds < 86400) {

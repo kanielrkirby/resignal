@@ -87,6 +87,7 @@ export type Conversation = {
   sharedGroupNames?: string[];
   profileFamilyName?: string;
   conversationTitle?: string;
+  isPinned?: boolean;
 }
 
 export const $conversations = map<Record<string, Conversation>>({})
