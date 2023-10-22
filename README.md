@@ -1,54 +1,38 @@
-# Astro Starter Kit: Basics
+# ReSignal
 
-```sh
-npm create astro@latest -- --template basics
-```
+ReSignal is a simple Signal interface, built out of personal necessity, to easily view old Signal messages from the SQLite database.
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/basics)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/astro/tree/latest/examples/basics)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/withastro/astro?devcontainer_path=.devcontainer/basics/devcontainer.json)
+## Features
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+- [x] Signal-like interface.
+- [x] Load and switch between different conversations.
+- [x] Nice looking animations and UI.
+- [x] Correctly display messages with attachments.
+- [x] Script to handle the decryption and copying of the database.
+- [x] Script also handles the copying of all of the attachments.
+- [x] Icons for the app used.
+- [ ] Tauri app to make it a standalone app.
+- [ ] Search functionality.
+- [x] More to come!
 
-![just-the-basics](https://github.com/withastro/astro/assets/2244813/a0a5533c-a856-4198-8470-2d67b1d7c554)
+## Usage
 
-## 🚀 Project Structure
+### Prerequisites
 
-Inside of your Astro project, you'll see the following folders and files:
+- You need to have the Signal app installed on your PC WITH THE MESSAGES YOU WANT TO SAVE. This won't work if you don't have the messages on your PC.
 
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src/
-│   ├── components/
-│   │   └── Card.astro
-│   ├── layouts/
-│   │   └── Layout.astro
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
+### Installation
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+- Clone the repo.
+- Run `./fetch.sh` to copy the database and attachments.
+- Run `npm install` to install all of the dependencies.
+- Run `npm run dev` to start the app.
+- Go to `localhost:4321` in your browser to view the app.
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+There will eventually be a standalone app for this, but for now, this is the primary way to use it.
 
-Any static assets, like images, can be placed in the `public/` directory.
+## Contributing
 
-## 🧞 Commands
+Contributions are welcome! Just open an issue or a PR and I'll take a look at it.
 
-All commands are run from the root of the project, from a terminal:
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).

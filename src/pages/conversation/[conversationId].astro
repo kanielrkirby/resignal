@@ -11,7 +11,7 @@ const { conversationId } = Astro.params;
 <Layout title={"Conversation"}>
   <ul
     id="messages"
-    class="flex h-full w-full flex-col space-y-4 overflow-y-scroll p-4 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-[#ffffff80] scrollbar-thumb-rounded-lg"
+    class="flex h-full w-full flex-col space-y-4 overflow-y-scroll overflow-x-hidden p-4 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-[#ffffff80] scrollbar-thumb-rounded-lg"
   >
   </ul>
 
@@ -89,7 +89,7 @@ const { conversationId } = Astro.params;
       }
       const media = `<div class="justify-center flex overflow-hidden max-w-[90%] cursor-pointer ${
         severalMedia ? "w-[25rem] h-40" : "w-[16rem] h-fit"
-      } rounded-md flex-wrap rounded-md">${imagesAndVideos}</div>`;
+      } rounded-md flex-wrap rounded-md overflow-hidden">${imagesAndVideos}</div>`;
 
       // timestamp grouping
       const groupPrev =
@@ -154,7 +154,7 @@ const { conversationId } = Astro.params;
               }, 1000);
             } else {
               const linkElem = `
-<li id=${messageId} class="sm:w-[85%] md:w-[75%] lg:w-[65%] flex ${topLi} ${alignItems} ${align}">
+<li id=${messageId} class="sm:w-[85%] md:w-[75%] lg:w-[65%] max-w-full flex justify-end overflow-hidden ${topLi} ${alignItems} ${align}">
   <div class="max-w-[90%] w-[20rem] h-fit shrink flex-col flex">
     <img src="${image}" alt="${title}" class="w-full object-cover rounded-md rounded-b-none" />
     <div class="justify-center flex overflow-hidden w-full cursor-pointer h-fit flex-wrap">
@@ -178,7 +178,7 @@ const { conversationId } = Astro.params;
         </div>
       </div>
     </div>
-    <div class="${color} ${topInner} ${bottomInner} justify-end gap-3 text-[.91rem] px-3 py-2 rounded-2xl rounded-t-none text-white w-full flex">
+    <div class="${color} ${topInner} ${bottomInner} justify-end gap-3 overflow-hidden text-[.91rem] px-3 py-2 rounded-2xl rounded-t-none text-white w-full flex">
       <p class="overflow-hidden underline">${body}</p>
       ${timestamp || ""}
     </div>
@@ -205,7 +205,7 @@ const { conversationId } = Astro.params;
             body
           }</p>${timestamp || ""}</div>`
         : "";
-      let elem = `<li id=${messageId} class="sm:w-[85%] md:w-[75%] lg:w-[65%] flex flex-col ${topLi} ${alignItems} ${align}">${media}${colorContainer}${audios}</li>`;
+      let elem = `<li id=${messageId} class="sm:w-[85%] md:w-[75%] lg:w-[65%] max-w-full flex flex-col ${topLi} ${alignItems} ${align}">${media}${colorContainer}${audios}</li>`;
 
       // date grouping
       const messageDay = new Date(m.timestamp!).toLocaleDateString();

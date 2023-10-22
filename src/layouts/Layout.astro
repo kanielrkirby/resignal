@@ -87,7 +87,6 @@ const { title = "Signal Reader" } = Astro.props;
     document.querySelector("#back-to-conversations")!.addEventListener("click", () => {
       history.back()
     })
-    throw new Error("Skipping code");
   }
   import type { Conversation } from "../store/conversations";
   import { timeSince } from "../utils/timeSince";
