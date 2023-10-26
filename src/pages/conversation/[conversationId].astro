@@ -87,8 +87,8 @@ const { conversationId } = Astro.params;
           audios += `<audio src="${attachment.url}" controls class=""></audio>`;
         }
       }
-      const media = `<div class="justify-center flex overflow-hidden max-w-[90%] cursor-pointer ${
-        severalMedia ? "w-[20rem] h-40" : "w-[16rem] h-fit"
+      const media = `<div class="justify-center flex overflow-hidden cursor-pointer w-[16rem] ${
+        severalMedia ? "h-40" : "h-fit"
       } rounded-md flex-wrap rounded-md overflow-hidden">${imagesAndVideos}</div>`;
 
       // timestamp grouping
@@ -155,7 +155,7 @@ const { conversationId } = Astro.params;
             } else {
               const linkElem = `
 <li id=${messageId} class="sm:w-[85%] md:w-[75%] lg:w-[65%] max-w-full flex ${topLi} ${alignItems} ${align}">
-  <div class="max-w-[90%] w-[20rem] h-fit shrink flex-col flex overflow-hidden">
+  <div class="h-fit shrink flex-col flex overflow-hidden">
     <img src="${image}" alt="${title}" class="w-full object-cover rounded-md rounded-b-none" />
     <div class="justify-center flex overflow-hidden w-full cursor-pointer h-fit flex-wrap">
       <div class="bg-zinc-800 grow flex flex-col justify-between p-3 w-full">
