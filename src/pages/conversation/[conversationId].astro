@@ -64,7 +64,7 @@ const { conversationId } = Astro.params;
 
       // conversation identity styling
       const align = m.type === "incoming" ? "self-start" : "self-end";
-      const alignItems = align === "self-start" ? "items-start" : "items-end";
+      const alignItems = align === "self-start" ? "items-start justify-start" : "items-end justify-end";
       const color = m.type === "incoming" ? "bg-neutral-700" : "bg-blue-600";
       let dateOrBlank = "";
 
@@ -88,7 +88,7 @@ const { conversationId } = Astro.params;
         }
       }
       const media = `<div class="justify-center flex overflow-hidden max-w-[90%] cursor-pointer ${
-        severalMedia ? "w-[25rem] h-40" : "w-[16rem] h-fit"
+        severalMedia ? "w-[20rem] h-40" : "w-[16rem] h-fit"
       } rounded-md flex-wrap rounded-md overflow-hidden">${imagesAndVideos}</div>`;
 
       // timestamp grouping
@@ -139,7 +139,7 @@ const { conversationId } = Astro.params;
       if (linkInBody) {
         body = body.replace(
           linkInBody[0],
-          `<a href="${linkInBody[0]}" target="_blank" class="underline">${linkInBody[0]}</a>`,
+          `<a href="${linkInBody[0]}" target="_blank" class="underline break-all">${linkInBody[0]}</a>`,
         );
         if (!hasVisualMedia) {
           (async () => {
@@ -154,8 +154,8 @@ const { conversationId } = Astro.params;
               }, 1000);
             } else {
               const linkElem = `
-<li id=${messageId} class="sm:w-[85%] md:w-[75%] lg:w-[65%] max-w-full flex justify-end overflow-hidden ${topLi} ${alignItems} ${align}">
-  <div class="max-w-[90%] w-[20rem] h-fit shrink flex-col flex">
+<li id=${messageId} class="sm:w-[85%] md:w-[75%] lg:w-[65%] max-w-full flex ${topLi} ${alignItems} ${align}">
+  <div class="max-w-[90%] w-[20rem] h-fit shrink flex-col flex overflow-hidden">
     <img src="${image}" alt="${title}" class="w-full object-cover rounded-md rounded-b-none" />
     <div class="justify-center flex overflow-hidden w-full cursor-pointer h-fit flex-wrap">
       <div class="bg-zinc-800 grow flex flex-col justify-between p-3 w-full">
@@ -179,7 +179,7 @@ const { conversationId } = Astro.params;
       </div>
     </div>
     <div class="${color} ${topInner} ${bottomInner} justify-end gap-3 overflow-hidden text-[.91rem] px-3 py-2 rounded-2xl rounded-t-none text-white w-full flex">
-      <p class="overflow-hidden underline">${body}</p>
+      <p class="overflow-hidden break-all underline">${body}</p>
       ${timestamp || ""}
     </div>
   </div>
