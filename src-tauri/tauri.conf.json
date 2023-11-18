@@ -1,18 +1,17 @@
 {
-  "$schema": "..\\node_modules/@tauri-apps/cli\\schema.json",
   "build": {
-    "beforeBuildCommand": "npm run next-build",
-    "beforeDevCommand": "npm run next dev",
+    "beforeBuildCommand": "pnpm build",
+    "beforeDevCommand": "pnpm dev",
     "devPath": "http://localhost:3000",
     "distDir": "../dist"
   },
   "package": {
-    "productName": "nextauri",
+    "productName": "tauri-astro",
     "version": "0.1.0"
   },
   "tauri": {
     "allowlist": {
-      "all": true
+      "all": false
     },
     "bundle": {
       "active": true,
@@ -29,7 +28,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.das.dev",
+      "identifier": "com.tauri.dev",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
@@ -48,19 +47,21 @@
       }
     },
     "security": {
-      "csp": null
+      "freezePrototype": true,
+      "csp": {
+        "default-src": "'none'",
+        "img-src": "'self'"
+      }
     },
     "updater": {
       "active": false
     },
     "windows": [
       {
-        "transparent": false,
-        "decorations": true,
         "fullscreen": false,
         "height": 600,
         "resizable": true,
-        "title": "nextauri",
+        "title": "Tauri + Astro",
         "width": 800
       }
     ]
