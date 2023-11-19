@@ -1,0 +1,38 @@
+{
+  "name": "@example/basics",
+  "version": "0.0.1",
+  "private": true,
+  "main": "index.astro",
+  "scripts": {
+    "astro:dev": "astro dev",
+    "start": "astro dev",
+    "astro:build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "format": "prettier --write \"src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}\"",
+    "dev": "npm run tauri dev",
+    "build": "npm run tauri build",
+    "tauri": "tauri"
+  },
+  "devDependencies": {
+    "@astrojs/tailwind": "^1.0.0",
+    "@tauri-apps/cli": "^1.1.1",
+    "astro": "^1.1.2",
+    "prettier": "^2.7.1",
+    "prettier-plugin-astro": "^0.5.4",
+    "typescript": "*"
+  },
+  "dependencies": {
+    "@astrojs/react": "^3.0.5",
+    "@nanostores/persistent": "^0.9.1",
+    "@nanostores/react": "^0.7.1",
+    "@tanstack/react-query": "^5.8.4",
+    "@tauri-apps/api": "^1.5.1",
+    "@types/react": "^18.2.37",
+    "@types/react-dom": "^18.2.15",
+    "nanostores": "^0.9.5",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "tauri-plugin-sql-api": "https://github.com/tauri-apps/tauri-plugin-sql#v1"
+  }
+}
